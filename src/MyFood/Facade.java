@@ -1,5 +1,4 @@
-package br.ufal.ic.p2.jackut;
-
+package MyFood;
 import easyaccept.EasyAccept;
 
 public class Facade {
