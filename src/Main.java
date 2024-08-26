@@ -1,4 +1,4 @@
-import br.ufal.ic.p2.myfood.Facade;
+import MyFood.Facade;
 import easyaccept.EasyAcceptFacade;
 
 import java.util.ArrayList;
@@ -19,10 +19,8 @@ public class Main {
 
         EasyAcceptFacade eaFacade = new EasyAcceptFacade(new Facade(), tests);
 
-        // Execute the tests
         eaFacade.executeTests();
 
-        // Print the tests execution results
         System.out.println(eaFacade.getCompleteResults());
     }
 }
