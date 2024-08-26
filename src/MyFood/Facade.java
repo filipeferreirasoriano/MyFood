@@ -12,7 +12,7 @@ public class Facade {
         system.zerarSistema();
     }
 
-    public String getAtributoUsuario(String id, String nomeAtributo) {
+    public String getAtributoUsuario(int id, String nomeAtributo) {
         return system.getAtributoUsuario(id, nomeAtributo);
     }
 
@@ -24,7 +24,7 @@ public class Facade {
         system.criarUsuario(nome, email, senha, endereco, cpf);
     }
 
-    public UUID login(String email, String senha) {
+    public int login(String email, String senha) {
         return system.login(email, senha);
     }
 

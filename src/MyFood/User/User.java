@@ -5,21 +5,21 @@ import java.util.Map;
 import java.util.UUID;
 
 public class User {
-    private final UUID id;
+    private final int id;
     private String name;
     private String email;
     private String password;
     private final Map<String, String> attributes;
 
     public User(String name, String email, String password) {
-        this.id = UUID.randomUUID();
+        this.id = UUID.randomUUID().hashCode();
         this.name = name;
         this.email = email;
         this.password = password;
         this.attributes = new HashMap<>();
     }
 
-    public UUID getId() {
+    public int getId() {
         return id;
     }
 

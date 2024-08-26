@@ -16,28 +16,24 @@ public class MyFoodSystem {
         users.clear();
     }
 
-    public String getAtributoUsuario(String idStr, String nomeAtributo) {
-        try {
-            UUID id = UUID.fromString(idStr);
-            User user = getUserById(id);
-            if (user == null) {
-                throw new IllegalArgumentException("Usuario nao cadastrado.");
-            }
-            if (user.hasAttribute(nomeAtributo)) {
-                return user.getAttribute(nomeAtributo);
-            } else {
-                throw new IllegalArgumentException("Atributo nao encontrado.");
-            }
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Usuario nao cadastrado.");
-        }
+    public String getAtributoUsuario(int id, String nomeAtributo) {
+       for(User u : users) {
+           if(u.getId() == id) {
+               switch(nomeAtributo) {
+                   case "nome": return u.getName();
+                   case "senha" :return u.getPassword();
+                   case "email": return u.getEmail();
+                   case "cpf", "endereco": return u.getAttribute(nomeAtributo);
+               }
+           }
+       }
+       throw new IllegalArgumentException("Usuario nao cadastrado.");
     }
 
-
     public void criarUsuario(String nome, String email, String senha, String endereco) {
-        validarUsuario(nome, email, senha, endereco, null);
+        validarUsuario(nome, email, senha, endereco);
         if (emailJaCadastrado(email)) {
-            throw new IllegalArgumentException("Conta com esse email ja existe.");
+            throw new IllegalArgumentException("Conta com esse email ja existe");
         }
         User user = new User(nome, email, senha);
         user.setAttribute("endereco", endereco);
@@ -45,12 +41,12 @@ public class MyFoodSystem {
     }
 
     public void criarUsuario(String nome, String email, String senha, String endereco, String cpf) {
-        validarUsuario(nome, email, senha, endereco, cpf);
-        if (emailJaCadastrado(email)) {
-            throw new IllegalArgumentException("Conta com esse email ja existe.");
-        }
+        validarUsuario(nome, email, senha, endereco);
         if (validarCPF(cpf)) {
             throw new IllegalArgumentException("CPF invalido");
+        }
+        if (emailJaCadastrado(email)) {
+            throw new IllegalArgumentException("Conta com esse email ja existe");
         }
         User user = new User(nome, email, senha);
         user.setAttribute("endereco", endereco);
@@ -59,11 +55,11 @@ public class MyFoodSystem {
     }
 
 
-    public UUID login(String email, String senha) {
+    public int login(String email, String senha) {
         for (User user : users) {
             if (user != null) {
-                String emailUsuario = user.getAttribute("email");
-                String senhaUsuario = user.getAttribute("senha");
+                String emailUsuario = user.getEmail();
+                String senhaUsuario = user.getPassword();
                 if(emailUsuario != null  && senhaUsuario != null) {
                     if(emailUsuario.equals(email) && senhaUsuario.equals(senha)) {
                         return user.getId();
@@ -75,13 +71,13 @@ public class MyFoodSystem {
     }
 
     public void encerrarSistema() {
-        System.out.println("Sistema encerrado.");
+        System.out.println("Sistema encerrado");
     }
 
     private boolean emailJaCadastrado(String email) {
         for (User user : users) {
             if (user != null) {
-                String emailUsuario = user.getAttribute("email");
+                String emailUsuario = user.getEmail();
                 if(emailUsuario != null && emailUsuario.equals(email)) {
                         return true;
                 }
@@ -90,30 +86,29 @@ public class MyFoodSystem {
         return false;
     }
 
-    private User getUserById(UUID id) {
+    private User getUserById(int id) {
         for (User user : users) {
-            if (user.getId().equals(id)) {
+            if (user.getId() == id) {
                 return user;
             }
         }
         return null;
     }
 
-    private void validarUsuario(String nome, String email, String senha, String endereco, String cpf) {
+    private void validarUsuario(String nome, String email, String senha, String endereco) {
         if (nome == null || nome.trim().isEmpty()) {
             throw new IllegalArgumentException("Nome invalido");
         }
-        if (email == null || email.trim().isEmpty() || !validarEmail(email)) {
+        if (email != null && email.trim().isEmpty()) {
+            throw new IllegalArgumentException("Formato de email invalido");
+        } else if(email == null || !validarEmail(email)){
             throw new IllegalArgumentException("Email invalido");
         }
         if (senha == null || senha.trim().isEmpty()) {
-            throw new IllegalArgumentException("Senha invalida");
+            throw new IllegalArgumentException("Senha invalido");
         }
         if (endereco == null || endereco.trim().isEmpty()) {
             throw new IllegalArgumentException("Endereco invalido");
-        }
-        if (cpf != null && validarCPF(cpf)) {
-            throw new IllegalArgumentException("CPF invalido");
         }
     }
 
