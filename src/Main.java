@@ -9,7 +9,7 @@ public class Main {
         List<String> tests = new ArrayList<>();
 
         tests.add("tests/us1_1.txt");
-//        tests.add("tests/us1_2.txt");
+        tests.add("tests/us1_2.txt");
 //        tests.add("tests/us2_2.txt");
 //        tests.add("tests/us2_2.txt");
 //        tests.add("tests/us3_1.txt");

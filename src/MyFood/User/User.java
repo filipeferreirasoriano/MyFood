@@ -1,6 +1,5 @@
 package MyFood.User;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -9,16 +8,18 @@ public class User {
     private String name;
     private String email;
     private String password;
-    private final Map<String, String> attributes;
+    private String endereco;
 
-    public User(String name, String email, String password) {
+    public User(String name, String email, String password, String endereco) {
         this.id = UUID.randomUUID().hashCode();
         this.name = name;
         this.email = email;
         this.password = password;
-        this.attributes = new HashMap<>();
+        this.endereco = endereco;
     }
-
+    public User() {
+        this.id = UUID.randomUUID().hashCode();
+    }
     public int getId() {
         return id;
     }
@@ -47,16 +48,20 @@ public class User {
         this.password = password;
     }
 
-    public void setAttribute(String key, String value) {
-        attributes.put(key, value);
+    public String getEndereco() {
+        return this.endereco;
+    }
+    public void setEndereco(String endereco) {
+        this.endereco = endereco;
     }
 
-    public String getAttribute(String key) {
-        return attributes.get(key);
+    public String getAtributo(String nomeAtributo) {
+        switch (nomeAtributo) {
+            case "nome": return getName();
+            case "email": return getEmail();
+            case "endereco": return getEndereco();
+            case "senha" : return getPassword();
+        }
+        return null;
     }
-
-    public boolean hasAttribute(String key) {
-        return attributes.containsKey(key);
-    }
-
 }
