@@ -266,7 +266,7 @@ public class MyFoodSystem {
 
     public String getAtributeEnterprise(int id, String attribute) {
         if(attribute == null) {
-            return "Atributo invalido";
+            throw new IllegalArgumentException("Atributo invalido");
         }
         for (ArrayList<Enterprise> enterpriseList : enterprises.values()) {
             for (Enterprise e : enterpriseList) {
