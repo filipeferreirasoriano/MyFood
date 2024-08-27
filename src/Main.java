@@ -11,8 +11,8 @@ public class Main {
         tests.add("tests/us1_1.txt");
         tests.add("tests/us1_2.txt");
         tests.add("tests/us2_1.txt");
-//        tests.add("tests/us2_2.txt");
-//        tests.add("tests/us3_1.txt");
+        tests.add("tests/us2_2.txt");
+        tests.add("tests/us3_1.txt");
 //        tests.add("tests/us3_2.txt");
 //        tests.add("tests/us4_1.txt");
 //        tests.add("tests/us4_2.txt");

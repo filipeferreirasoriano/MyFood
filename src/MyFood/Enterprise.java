@@ -11,6 +11,10 @@ public class Enterprise {
     private String typeEnterprise;
     private String typeKitchen;
 
+    public Enterprise() {
+
+    }
+
     public Enterprise(String typeEnterprise, int dono, String name, String address, String typeKitchen) {
         this.id = UUID.randomUUID().hashCode();
         this.dono = dono;

@@ -204,13 +204,19 @@ public class MyFoodSystem {
         }
 
         List<Enterprise> enterprisesList = enterprises.get(idDono);
-        if (enterprisesList == null || indice >= enterprisesList.size() - 1) {
-            throw new IllegalArgumentException("Indice maior que o esperado");
+
+        int count = 0;
+        for (Enterprise enterprise : enterprisesList) {
+            if (enterprise.getDono() == idDono && enterprise.getName().equals(name)){
+                if(count == indice) {
+                    return enterprise.getId();
+                }
+                count++;
+            }
         }
 
-        Enterprise enterprise = enterprisesList.get(indice);
-        if (enterprise.getName().equals(name)) {
-            return enterprise.getId();
+        if(count != 0) {
+            throw new IllegalArgumentException("Indice maior que o esperado");
         }
 
         throw new IllegalArgumentException("Nao existe empresa com esse nome");
@@ -251,6 +257,9 @@ public class MyFoodSystem {
     }
 
     public String getAtributeEnterprise(int id, String attribute) {
+        if(attribute == null) {
+            return "Atributo invalido";
+        }
         for (ArrayList<Enterprise> enterpriseList : enterprises.values()) {
             for (Enterprise e : enterpriseList) {
                 if (e.getId() == id) {
