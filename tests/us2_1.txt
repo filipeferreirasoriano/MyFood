@@ -1,5 +1,5 @@
 # User Story 2 - Criação de Restaurantes
-# Permita que um usuário do tipo dono de restaurante crie seu restaurante no MyFood, 
+# Permita que um usuário do tipo dono de empresa crie seu restaurante, mercado ou farmacia no MyFood.
 #
 # Os dados gerais para os restaurantes são:
 # id -> Que deve ser do tipo int e único gerado pelo sistema.
@@ -89,17 +89,15 @@ expect "Atributo invalido" getAtributoEmpresa empresa=${eid3} atributo=
 
 # Obtendo o index de uma empresa. 
 
-expect "${eid1}" getIdEmpresa idDono=${id2} nome="Pastelaria do Carlos" indice=0
-expect "${eid4}" getIdEmpresa idDono=${id2} nome="Pastelaria do Carlos" indice=1
-expect "${eid2}" getIdEmpresa idDono=${id2} nome="Sushi do Carlos" indice=0
-expectError "indice maior que o esperado" getIdEmpresa idDono=${id2} nome="Pastelaria do Carlos" indice=2
-expectError "Não existe empresa com esse nome" getIdEmpresa idDono=${id2} nome="Sushi do Carlos" indice=0
+expect ${eid1} getIdEmpresa idDono=${id2} nome="Pastelaria do Carlos" indice=0
+expect ${eid4} getIdEmpresa idDono=${id2} nome="Pastelaria do Carlos" indice=1
+expect ${eid2} getIdEmpresa idDono=${id2} nome="Sushi do Carlos" indice=0
+expectError "Indice maior que o esperado" getIdEmpresa idDono=${id2} nome="Pastelaria do Carlos" indice=2
+expectError "Nao existe empresa com esse nome" getIdEmpresa idDono=${id2} nome="Sorveteria do Carlos" indice=0
 
 expectError "Nome invalido" getIdEmpresa idDono=${id2} nome=  indice=2
 expectError "Nome invalido" getIdEmpresa idDono=${id2} nome=""  indice=2
-expectError "Indice invalido" getIdEmpresa idDono=${id2} nome="Pastelaria do Carlos" indice=  
-
-
+expectError "Indice invalido" getIdEmpresa idDono=${id2} nome="Pastelaria do Carlos" indice=-1
 
 encerrarSistema
 quit
