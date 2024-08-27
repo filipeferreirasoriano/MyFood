@@ -8,14 +8,14 @@ public class User {
     private String name;
     private String email;
     private String password;
-    private String endereco;
+    private String address;
 
-    public User(String name, String email, String password, String endereco) {
+    public User(String name, String email, String password, String address) {
         this.id = UUID.randomUUID().hashCode();
         this.name = name;
         this.email = email;
         this.password = password;
-        this.endereco = endereco;
+        this.address = address;
     }
     public User() {
         this.id = UUID.randomUUID().hashCode();
@@ -49,17 +49,17 @@ public class User {
     }
 
     public String getEndereco() {
-        return this.endereco;
+        return this.address;
     }
-    public void setEndereco(String endereco) {
-        this.endereco = endereco;
+    public void setEndereco(String address) {
+        this.address = address;
     }
 
-    public String getAtributo(String nomeAtributo) {
+    public String getAtribute(String nomeAtributo) {
         switch (nomeAtributo) {
             case "nome": return getName();
             case "email": return getEmail();
-            case "endereco": return getEndereco();
+            case "address": return getEndereco();
             case "senha" : return getPassword();
         }
         return null;

@@ -4,13 +4,13 @@
   <void method="add">
    <object class="MyFood.User.User">
     <void property="email">
-     <string>carlos@ufal.com.br</string>
+     <string>lucas@ufal.com.br</string>
     </void>
     <void property="endereco">
-     <string>Rua Exemplo N 123</string>
+     <string>Rua Exemplo N 321</string>
     </void>
     <void property="name">
-     <string>Carlos</string>
+     <string>Lucas</string>
     </void>
     <void property="password">
      <string>123senha</string>
@@ -23,7 +23,7 @@
      <string>544.732.410-68</string>
     </void>
     <void property="email">
-     <string>carlos2@ufal.com.br</string>
+     <string>carlos@ufal.com.br</string>
     </void>
     <void property="endereco">
      <string>Rua Exemplo N 321</string>
@@ -35,6 +35,35 @@
      <string>123senha</string>
     </void>
    </object>
+  </void>
+  <void method="add">
+   <object class="MyFood.User.Manager">
+    <void property="cpf">
+     <string>544.732.410-68</string>
+    </void>
+    <void property="email">
+     <string>roberto@ufal.com.br</string>
+    </void>
+    <void property="endereco">
+     <string>Rua Exemplo N 321</string>
+    </void>
+    <void property="name">
+     <string>RobertoDono</string>
+    </void>
+    <void property="password">
+     <string>123senha</string>
+    </void>
+   </object>
+  </void>
+ </object>
+ <object class="java.util.HashMap">
+  <void method="put">
+   <int>1238879061</int>
+   <object class="java.util.ArrayList"/>
+  </void>
+  <void method="put">
+   <int>-1423360562</int>
+   <object class="java.util.ArrayList"/>
   </void>
  </object>
 </java>
