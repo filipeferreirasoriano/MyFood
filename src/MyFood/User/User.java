@@ -1,6 +1,5 @@
 package MyFood.User;
 
-import java.util.Map;
 import java.util.UUID;
 
 public class User {
@@ -17,9 +16,11 @@ public class User {
         this.password = password;
         this.address = address;
     }
+
     public User() {
         this.id = UUID.randomUUID().hashCode();
     }
+
     public int getId() {
         return id;
     }
@@ -51,6 +52,7 @@ public class User {
     public String getEndereco() {
         return this.address;
     }
+
     public void setEndereco(String address) {
         this.address = address;
     }

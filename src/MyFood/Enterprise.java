@@ -1,5 +1,6 @@
 package MyFood;
 
+
 import java.util.UUID;
 
 public class Enterprise {
@@ -10,6 +11,7 @@ public class Enterprise {
     private String address;
     private String typeEnterprise;
     private String typeKitchen;
+
 
     public Enterprise() {
 

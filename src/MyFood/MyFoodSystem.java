@@ -1,5 +1,6 @@
 package MyFood;
 
+import MyFood.Product.Product;
 import MyFood.User.Manager;
 import MyFood.User.User;
 
@@ -16,18 +17,49 @@ public class MyFoodSystem {
 
     private ArrayList<User> users;
     private HashMap<Integer, ArrayList<Enterprise>> enterprises;
+    private HashMap<Integer, ArrayList<Product>> products;
+
+// Gerenciamento do sistema geral
 
     public MyFoodSystem() {
         users = new ArrayList<>();
         enterprises = new HashMap<>();
+        products = new HashMap<>();
         loadData();
     }
 
     public void zerarSistema() {
         users.clear();
         enterprises.clear();
+        products.clear();
         saveData();
     }
+
+    public void saveData() {
+        try (FileOutputStream fos = new FileOutputStream("myfoodsystem.xml");
+             XMLEncoder encoder = new XMLEncoder(fos)) {
+            encoder.writeObject(users);
+            encoder.writeObject(enterprises);
+            encoder.writeObject(products);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void loadData() {
+        try (FileInputStream fis = new FileInputStream("myfoodsystem.xml");
+             XMLDecoder decoder = new XMLDecoder(fis)) {
+            users = (ArrayList<User>) decoder.readObject();
+            enterprises = (HashMap<Integer, ArrayList<Enterprise>>) decoder.readObject();
+            products = (HashMap<Integer, ArrayList<Product>>) decoder.readObject();
+        } catch (Exception e) {
+            users = new ArrayList<>();
+            enterprises = new HashMap<>();
+            products = new HashMap<>();
+        }
+    }
+
+// Gerenciamento de usuários
 
     public User getUserById(int id) {
         for (User user : users) {
@@ -119,32 +151,6 @@ public class MyFoodSystem {
         return cpf != null && cpf.matches("\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}");
     }
 
-    public void saveData() {
-        try (FileOutputStream fos = new FileOutputStream("myfoodsystem.xml");
-             XMLEncoder encoder = new XMLEncoder(fos)) {
-            encoder.writeObject(users);
-            encoder.writeObject(enterprises);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void loadData() {
-        try (FileInputStream fis = new FileInputStream("myfoodsystem.xml");
-             XMLDecoder decoder = new XMLDecoder(fis)) {
-            users = (ArrayList<User>) decoder.readObject();
-            enterprises = (HashMap<Integer, ArrayList<Enterprise>>) decoder.readObject();
-        } catch (ArrayIndexOutOfBoundsException e) {
-            users = new ArrayList<>();
-            enterprises = new HashMap<>();
-        } catch (IOException e) {
-            users = new ArrayList<>();
-            enterprises = new HashMap<>();
-        } catch (Exception e) {
-            users = new ArrayList<>();
-            enterprises = new HashMap<>();
-        }
-    }
 
     public ArrayList<Enterprise> getEnterprises(int dono) {
         User user = getUserById(dono);
@@ -164,6 +170,8 @@ public class MyFoodSystem {
 
         return ans;
     }
+
+// Gerenciamento de empresas
 
     public String getEnterprisesHash(int dono) {
         User user = getUserById(dono);
@@ -282,5 +290,150 @@ public class MyFoodSystem {
             }
         }
         throw new IllegalArgumentException("Empresa nao cadastrada");
+    }
+
+// Gerenciamento de Produtos
+
+    public int criarProduto(int enterprise, String name, Double valor, String category) {
+
+        if(category == null || category.trim().isEmpty()) {
+            throw new IllegalArgumentException("Categoria invalido");
+        }
+
+        if(name == null || name.trim().isEmpty()) {
+            throw new IllegalArgumentException("Nome invalido");
+        }
+
+        if(valor < 0) {
+            throw new IllegalArgumentException("Valor invalido");
+        }
+
+        ArrayList<Product> enterpriseProducts = products.get(enterprise);
+        if(enterpriseProducts == null) {
+            enterpriseProducts = new ArrayList<>();
+        } else {
+            for (Product product : enterpriseProducts) {
+                if (product.getName().equals(name)) {
+                    throw new IllegalArgumentException("Ja existe um produto com esse nome para essa empresa");
+                }
+            }
+        }
+
+        Product product = new Product(name, valor, category);
+        enterpriseProducts.add(product);
+        products.put(enterprise,enterpriseProducts);
+
+        return product.getId();
+    }
+
+    public void editProduct(int id, String name, Double value, String category) {
+
+        if(category == null || category.trim().isEmpty()) {
+            throw new IllegalArgumentException("Categoria invalido");
+        }
+
+        if(name == null || name.trim().isEmpty()) {
+            throw new IllegalArgumentException("Nome invalido");
+        }
+
+        if(value < 0) {
+            throw new IllegalArgumentException("Valor invalido");
+        }
+
+
+        Product current = null;
+        for(ArrayList<Product> enterpriseProducts : products.values()) {
+            for (Product product : enterpriseProducts) {
+                if(product.getId() == id) {
+                    current = product;
+                    product.setName(name);
+                    product.setValue(value);
+                    product.setCategory(category);
+                    break;
+                }
+            }
+        }
+        if(current == null) {
+            throw new IllegalArgumentException("Produto nao cadastrado");
+        }
+    }
+
+    public String getProduto(String  name, int enterprise, String atribute) {
+
+        if(name == null || name.trim().isEmpty()) {
+            throw new IllegalArgumentException("Nome invalido");
+        }
+        if(atribute == null || atribute.trim().isEmpty()) {
+            throw new IllegalArgumentException("Atributo invalido");
+        }
+
+        ArrayList<Product> enterpriseProducts = products.get(enterprise);
+        Product current = null;
+        Enterprise currentEterprise = null;
+        if(enterpriseProducts == null) {
+            enterpriseProducts = new ArrayList<>();
+        } else {
+            for (Product product : enterpriseProducts) {
+                if (product.getName().equals(name)) {
+                   current = product;
+                }
+            }
+        }
+        for(ArrayList<Enterprise> enterpriseList : enterprises.values()){
+            for (Enterprise e : enterpriseList) {
+                if (e.getId() == enterprise) {
+                    currentEterprise = e;
+                    break;
+                }
+            }
+        }
+        if(current == null) {
+            throw new IllegalArgumentException("Produto nao encontrado");
+        }
+        if(currentEterprise == null) {
+            throw new IllegalArgumentException("Produto nao encontrado");
+        }
+        return switch (atribute) {
+            case "nome" -> current.getName();
+            case "valor" -> current.getValue().toString() + "0";
+            case "categoria" -> current.getCategory();
+            case "empresa" -> currentEterprise.getName();
+            default -> throw new IllegalArgumentException("Atributo nao existe");
+        };
+    }
+
+    public String getProducts(int enterprise) {
+
+        Enterprise currentEterprise = null;
+        for(ArrayList<Enterprise> enterpriseList : enterprises.values()){
+            for (Enterprise e : enterpriseList) {
+                if (e.getId() == enterprise) {
+                    currentEterprise = e;
+                    break;
+                }
+            }
+        }
+
+        if(currentEterprise == null) {
+            throw new IllegalArgumentException("Empresa nao encontrada");
+        }
+
+        ArrayList<Product> productsList = products.get(enterprise);
+        String ans = "{[";
+
+        if(productsList == null) {
+            ans = "{[]}";
+            return ans;
+        }
+
+        for(Product product : productsList) {
+            ans += product.getName();
+            if(product != productsList.get(productsList.size() - 1)) {
+                ans += ", ";
+            }
+        }
+        ans += "]}";
+
+        return ans;
     }
 }

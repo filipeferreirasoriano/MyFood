@@ -1,4 +1,6 @@
 package MyFood;
+import MyFood.Product.Product;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,13 +40,33 @@ public class Facade {
     public String getEmpresasDoUsuario(int id) {
         return system.getEnterprisesHash(id);
     }
+
     public int criarEmpresa(String tipoEmpresa, int dono, String nome, String endereco, String tipoCozinha) {
         return system.createEnterprise(tipoEmpresa, dono, nome, endereco, tipoCozinha);
     }
+
     public int getIdEmpresa (int idDono, String nome, int indice) {
         return system.getIdEnterprise(idDono, nome, indice);
     }
+
     public String getAtributoEmpresa(int id, String nomeAtributo) {
         return system.getAtributeEnterprise(id, nomeAtributo);
     }
+
+    public int criarProduto(int enterprise, String name, Double valor, String category) {
+        return system.criarProduto(enterprise, name, valor, category);
+    }
+
+    public void editarProduto(int id, String nome, Double valor, String categoria) {
+        system.editProduct(id, nome, valor, categoria);
+    }
+
+    public String getProduto(String  name, int enterprise, String atribute) {
+        return system.getProduto(name, enterprise, atribute);
+    }
+
+    public String listarProdutos(int enterprise) {
+        return system.getProducts(enterprise);
+    }
+
 }

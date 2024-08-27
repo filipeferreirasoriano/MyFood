@@ -10,13 +10,6 @@ public class Manager extends User {
     public Manager() {
 
     }
-    public String getCpf() {
-        return cpf;
-    }
-
-    public void setCpf(String cpf) {
-        this.cpf = cpf;
-    }
 
     @Override
     public String getAtribute(String nomeAtributo) {

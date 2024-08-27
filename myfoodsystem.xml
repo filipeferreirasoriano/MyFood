@@ -1,11 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<java version="17.0.11" class="java.beans.XMLDecoder">
+<java version="17.0.12" class="java.beans.XMLDecoder">
  <object class="java.util.ArrayList">
   <void method="add">
    <object class="MyFood.User.Manager">
-    <void property="cpf">
-     <string>544.732.410-68</string>
-    </void>
     <void property="email">
      <string>roberto@ufal.com.br</string>
     </void>
@@ -23,7 +20,7 @@
  </object>
  <object class="java.util.HashMap">
   <void method="put">
-   <int>1449599233</int>
+   <int>1644351755</int>
    <object class="java.util.ArrayList">
     <void method="add">
      <object class="MyFood.Enterprise">
@@ -31,10 +28,10 @@
        <string>Rua Segura N 987</string>
       </void>
       <void property="dono">
-       <int>1449599233</int>
+       <int>1644351755</int>
       </void>
       <void property="id">
-       <int>1304334599</int>
+       <int>-756721193</int>
       </void>
       <void property="name">
        <string>Sorveteria do Roberto</string>
@@ -53,10 +50,10 @@
        <string>Rua Segura N 987</string>
       </void>
       <void property="dono">
-       <int>1449599233</int>
+       <int>1644351755</int>
       </void>
       <void property="id">
-       <int>-1498312199</int>
+       <int>814983241</int>
       </void>
       <void property="name">
        <string>Pastelaria do Roberto</string>
@@ -75,10 +72,10 @@
        <string>Rua Segura N 987</string>
       </void>
       <void property="dono">
-       <int>1449599233</int>
+       <int>1644351755</int>
       </void>
       <void property="id">
-       <int>1446967228</int>
+       <int>108018818</int>
       </void>
       <void property="name">
        <string>Churrascaria do Roberto</string>
@@ -88,6 +85,66 @@
       </void>
       <void property="typeKitchen">
        <string>brasileira</string>
+      </void>
+     </object>
+    </void>
+   </object>
+  </void>
+ </object>
+ <object class="java.util.HashMap">
+  <void method="put">
+   <int>-756721193</int>
+   <object class="java.util.ArrayList">
+    <void method="add">
+     <object class="MyFood.Product.Product">
+      <void property="category">
+       <string>alimento</string>
+      </void>
+      <void property="id">
+       <int>-1648677339</int>
+      </void>
+      <void property="name">
+       <string>Sorvete morango</string>
+      </void>
+      <void property="value">
+       <double>1.4</double>
+      </void>
+     </object>
+    </void>
+    <void method="add">
+     <object class="MyFood.Product.Product">
+      <void property="category">
+       <string>bebida</string>
+      </void>
+      <void property="id">
+       <int>1618976038</int>
+      </void>
+      <void property="name">
+       <string>Refrigerante</string>
+      </void>
+      <void property="value">
+       <double>3.0</double>
+      </void>
+     </object>
+    </void>
+   </object>
+  </void>
+  <void method="put">
+   <int>814983241</int>
+   <object class="java.util.ArrayList">
+    <void method="add">
+     <object class="MyFood.Product.Product">
+      <void property="category">
+       <string>bebida</string>
+      </void>
+      <void property="id">
+       <int>-1695115866</int>
+      </void>
+      <void property="name">
+       <string>Refrigerante de laranja</string>
+      </void>
+      <void property="value">
+       <double>4.4</double>
       </void>
      </object>
     </void>
