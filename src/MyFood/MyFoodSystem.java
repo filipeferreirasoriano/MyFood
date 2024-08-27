@@ -49,7 +49,7 @@ public class MyFoodSystem {
     public void createUser(String name, String email, String password, String address) {
         validateUser(name, email, password, address);
         if (emailExist(email)) {
-            throw new IllegalArgumentException("Conta com esse email ja existe.");
+            throw new IllegalArgumentException("Conta com esse email ja existe");
         }
         User user = new User(name, email, password, address);
         users.add(user);
@@ -59,10 +59,10 @@ public class MyFoodSystem {
     public void createUser(String name, String email, String password, String address, String cpf) {
         validateUser(name, email, password, address);
         if (!validateCPF(cpf)) {
-            throw new IllegalArgumentException("CPF invalido.");
+            throw new IllegalArgumentException("CPF invalido");
         }
         if (emailExist(email)) {
-            throw new IllegalArgumentException("Conta com esse email ja existe.");
+            throw new IllegalArgumentException("Conta com esse email ja existe");
         }
         Manager manager = new Manager(name, email, password, address, cpf);
         users.add(manager);
@@ -70,17 +70,20 @@ public class MyFoodSystem {
     }
 
     public int login(String email, String password) {
+        if(email == null || password == null || email.isEmpty() || password.isEmpty()) {
+            throw new IllegalArgumentException("Login ou senha invalidos");
+        }
         for (User user : users) {
             if (user != null && email.equals(user.getEmail()) && password.equals(user.getPassword())) {
                 return user.getId();
             }
         }
-        throw new IllegalArgumentException("Login ou senha invalidos.");
+        throw new IllegalArgumentException("Login ou senha invalidos");
     }
 
     public void encerrarSistema() {
         saveData();
-        System.out.println("Sistema encerrado.");
+        System.out.println("Sistema encerrado");
     }
 
     private boolean emailExist(String email) {
@@ -94,16 +97,16 @@ public class MyFoodSystem {
 
     private void validateUser(String name, String email, String password, String address) {
         if (name == null || name.trim().isEmpty()) {
-            throw new IllegalArgumentException("Nome invalido.");
+            throw new IllegalArgumentException("Nome invalido");
         }
         if (email == null || !validateEmail(email)) {
-            throw new IllegalArgumentException("Email invalido ou formato de email invalido.");
+            throw new IllegalArgumentException("Email invalido");
         }
         if (password == null || password.trim().isEmpty()) {
-            throw new IllegalArgumentException("Senha invalida.");
+            throw new IllegalArgumentException("Senha invalido");
         }
         if (address == null || address.trim().isEmpty()) {
-            throw new IllegalArgumentException("Endereço invalido.");
+            throw new IllegalArgumentException("Endereco invalido");
         }
     }
 
