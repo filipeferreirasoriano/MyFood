@@ -59,7 +59,7 @@ public class User {
         switch (nomeAtributo) {
             case "nome": return getName();
             case "email": return getEmail();
-            case "address": return getEndereco();
+            case "endereco": return getEndereco();
             case "senha" : return getPassword();
         }
         return null;
