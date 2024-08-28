@@ -1,5 +1,6 @@
 package MyFood;
 
+import MyFood.Order.ShoppingCart;
 import MyFood.Product.Product;
 import MyFood.User.Manager;
 import MyFood.User.User;
@@ -12,12 +13,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 public class MyFoodSystem {
 
     private ArrayList<User> users;
     private HashMap<Integer, ArrayList<Enterprise>> enterprises;
     private HashMap<Integer, ArrayList<Product>> products;
+    private ArrayList<ShoppingCart> shoppingCarts;
 
 // Gerenciamento do sistema geral
 
@@ -25,6 +28,7 @@ public class MyFoodSystem {
         users = new ArrayList<>();
         enterprises = new HashMap<>();
         products = new HashMap<>();
+        shoppingCarts = new ArrayList<>();
         loadData();
     }
 
@@ -435,5 +439,118 @@ public class MyFoodSystem {
         ans += "]}";
 
         return ans;
+    }
+
+    public int createOrder(int clientId, int enterpriseId) {
+        if(enterprises.get(clientId) != null) {
+            throw new IllegalArgumentException("Dono de empresa nao pode fazer um pedido");
+        }
+        if(shoppingCarts.stream().anyMatch(shoppingCart -> shoppingCart.getClientId() == clientId && shoppingCart.getEnterpriseId() == enterpriseId && shoppingCart.isOpenOrder())) {
+            throw new IllegalArgumentException("Nao e permitido ter dois pedidos em aberto para a mesma empresa");
+        }
+
+        ShoppingCart shoppingCart = new ShoppingCart(clientId, enterpriseId);
+        shoppingCarts.add(shoppingCart);
+        return shoppingCart.getOrderId();
+    }
+
+    public void addProductToShoppingCart(int orderId, int productId) {
+        if(shoppingCarts.isEmpty()) {
+            throw new IllegalArgumentException("Nao existe pedido em aberto");
+        }
+
+        ShoppingCart shoppingCart = shoppingCarts.stream()
+                                    .filter(cart -> cart.getOrderId() == orderId)
+                                    .findFirst()
+                                    .orElseThrow(() -> new IllegalArgumentException("Nao existe pedido em aberto"));
+
+        if(!shoppingCart.isOpenOrder()) {
+            throw new IllegalArgumentException("Nao e possivel adicionar produtos a um pedido fechado");
+        }
+
+        Product product = products.get(shoppingCart.getEnterpriseId()).stream().filter(prod -> prod.getId() == productId).findFirst().orElse(null);
+        if(product == null) {
+            throw new IllegalArgumentException("O produto nao pertence a essa empresa");
+        }
+        shoppingCart.addProduct(product);
+    }
+
+    public String getOrderAttribute(int orderId, String attribute) {
+        if(attribute == null || attribute.trim().isEmpty()) {
+            throw new IllegalArgumentException("Atributo invalido");
+        }
+        ShoppingCart shoppingCart = shoppingCarts.stream().filter(cart -> cart.getOrderId() == orderId)
+                                    .findFirst().orElseThrow(() -> new IllegalArgumentException("Nao existe pedido em aberto"));
+
+        if(attribute.equals("cliente")) {
+            User user = users.stream().filter(u -> u.getId() == shoppingCart.getClientId()).findFirst().orElse(null);
+            return user.getName();
+        }
+        else if(attribute.equals("empresa")) {
+            for(ArrayList<Enterprise> enterpriseList : enterprises.values()){
+                Enterprise enterprise = enterpriseList.stream().filter(e -> e.getId() == shoppingCart.getEnterpriseId()).findFirst().orElse(null);
+                if(enterprise != null) {
+                    return enterprise.getName();
+                }
+            }
+        }
+        else if(attribute.equals("estado")) {
+            if(shoppingCart.isOpenOrder()) {
+                return "aberto";
+            }
+            else {
+                return "preparando";
+            }
+        }
+        else if(attribute.equals("produtos")) {
+            ArrayList<Product> productList = shoppingCart.getProducts();
+
+            String ans = "{[";
+            boolean first = true;
+            for(Product product : productList) {
+                if(!first) {
+                    ans += ", ";
+                }
+                first = false;
+
+                ans += product.getName();
+            }
+            ans += "]}";
+            return ans;
+        }
+        else if(attribute.equals("valor")) {
+            return String.format("%.2f", shoppingCart.getTotalPrice());
+        }
+        else {
+            throw new IllegalArgumentException("Atributo nao existe");
+        }
+        return null;
+    }
+
+    public void closeOrder(int orderId) {
+        ShoppingCart shoppingCart = shoppingCarts.stream().filter(cart -> cart.getOrderId() == orderId).findFirst().orElse(null);
+        if(shoppingCart == null) {
+            throw new IllegalArgumentException("Pedido nao encontrado");
+        }
+        shoppingCart.setOpenOrder(false);
+    }
+
+    public void removeProductFromShoppingCart(int orderId, String product) {
+        if(product == null || product.trim().isEmpty()) {
+            throw new IllegalArgumentException("Produto invalido");
+        }
+
+        ShoppingCart shoppingCart = shoppingCarts.stream().filter(cart -> cart.getOrderId() == orderId)
+                                    .findFirst().orElseThrow(() -> new IllegalArgumentException("Nao existe pedido em aberto"));
+
+        if(!shoppingCart.isOpenOrder()) {
+            throw new IllegalArgumentException("Nao e possivel remover produtos de um pedido fechado");
+        }
+        ArrayList<Product> productList = shoppingCart.getProducts();
+
+        Product productToRemove = productList.stream().filter(prod -> prod.getName().equals(product))
+                                    .findFirst().orElseThrow(() -> new IllegalArgumentException("Produto nao encontrado"));
+
+        shoppingCart.removeProduct(productToRemove);
     }
 }

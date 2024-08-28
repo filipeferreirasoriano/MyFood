@@ -69,4 +69,23 @@ public class Facade {
         return system.getProducts(enterprise);
     }
 
+    public int criarPedido(int clientId, int enterpriseId) {
+        return system.createOrder(clientId, enterpriseId);
+    }
+
+    public void adicionarProduto(int orderId, int productId) {
+        system.addProductToShoppingCart(orderId, productId);
+    }
+
+    public String getPedidos(int orderId, String attribute) {
+        return system.getOrderAttribute(orderId, attribute);
+    }
+
+    public void fecharPedido(int orderId) {
+        system.closeOrder(orderId);
+    }
+
+    public void removerProduto(int orderId, String product) {
+        system.removeProductFromShoppingCart(orderId, product);
+    }
 }
