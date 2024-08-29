@@ -2,66 +2,64 @@ package MyFood;
 
 import MyFood.Order.ShoppingCart;
 import MyFood.Product.Product;
+import MyFood.User.Manager;
 import MyFood.User.User;
-import java.util.List;
-import java.util.HashMap;
-import java.io.IOException;
-import java.util.ArrayList;
+
 import java.beans.XMLEncoder;
 import java.beans.XMLDecoder;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
 
 public class MyFoodSystem {
 
     private ArrayList<User> users;
-    private ArrayList<ShoppingCart> shoppingCarts;
-    private HashMap<Integer, ArrayList<Product>> products;
     private HashMap<Integer, ArrayList<Enterprise>> enterprises;
+    private HashMap<Integer, ArrayList<Product>> products;
+    private ArrayList<ShoppingCart> shoppingCarts;
 
 // Gerenciamento do sistema geral
 
     public MyFoodSystem() {
         users = new ArrayList<>();
-        products = new HashMap<>();
         enterprises = new HashMap<>();
+        products = new HashMap<>();
         shoppingCarts = new ArrayList<>();
         loadData();
     }
 
     public void zerarSistema() {
         users.clear();
-        products.clear();
         enterprises.clear();
-        shoppingCarts.clear();
+        products.clear();
         saveData();
     }
 
     public void saveData() {
         try (FileOutputStream fos = new FileOutputStream("myfoodsystem.xml");
-            XMLEncoder encoder = new XMLEncoder(fos)) {
+             XMLEncoder encoder = new XMLEncoder(fos)) {
             encoder.writeObject(users);
-            encoder.writeObject(products);
             encoder.writeObject(enterprises);
-            encoder.writeObject(shoppingCarts);
+            encoder.writeObject(products);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-
     public void loadData() {
         try (FileInputStream fis = new FileInputStream("myfoodsystem.xml");
-            XMLDecoder decoder = new XMLDecoder(fis)) {
+             XMLDecoder decoder = new XMLDecoder(fis)) {
             users = (ArrayList<User>) decoder.readObject();
-            shoppingCarts = (ArrayList<ShoppingCart>) decoder.readObject();
-            products = (HashMap<Integer, ArrayList<Product>>) decoder.readObject();
             enterprises = (HashMap<Integer, ArrayList<Enterprise>>) decoder.readObject();
+            products = (HashMap<Integer, ArrayList<Product>>) decoder.readObject();
         } catch (Exception e) {
             users = new ArrayList<>();
-            products = new HashMap<>();
             enterprises = new HashMap<>();
-            shoppingCarts = new ArrayList<>();
+            products = new HashMap<>();
         }
     }
 
@@ -96,15 +94,14 @@ public class MyFoodSystem {
 
     public void createUser(String name, String email, String password, String address, String cpf) {
         validateUser(name, email, password, address);
-        if(cpf == null || !validateCPF(cpf)) {
+        if (!validateCPF(cpf)) {
             throw new IllegalArgumentException("CPF invalido");
         }
         if (emailExist(email)) {
             throw new IllegalArgumentException("Conta com esse email ja existe");
         }
-        User user = new User(name, email, password, address, cpf);
-        user.setManager();
-        users.add(user);
+        Manager manager = new Manager(name, email, password, address, cpf);
+        users.add(manager);
         saveData();
     }
 
@@ -150,13 +147,14 @@ public class MyFoodSystem {
     }
 
     private boolean validateEmail(String email) {
-        String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*(@?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
+        String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
         return email.matches(emailRegex);
     }
 
     private boolean validateCPF(String cpf) {
-        return cpf.length() == 14;
+        return cpf != null && cpf.matches("\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}");
     }
+
 
     public ArrayList<Enterprise> getEnterprises(int dono) {
         User user = getUserById(dono);
@@ -173,6 +171,7 @@ public class MyFoodSystem {
                 }
             }
         }
+
         return ans;
     }
 
@@ -184,28 +183,28 @@ public class MyFoodSystem {
             throw new IllegalArgumentException("Usuario nao pode criar uma empresa");
         }
 
-        StringBuilder ans = new StringBuilder("{[[");
+        String ans = "{[[";
         boolean hasEnterprise = false;
 
         for (ArrayList<Enterprise> enterpriseList : enterprises.values()) {
             for (Enterprise e : enterpriseList) {
                 if (e != null && e.getDono() == dono) {
                     if (hasEnterprise) {
-                        ans.append("], [");
+                        ans += "], [";
                     }
-                    ans.append(e.getName()).append(", ").append(e.getAddress());
+                    ans += e.getName() + ", " + e.getAddress();
                     hasEnterprise = true;
                 }
             }
         }
 
         if (hasEnterprise) {
-            ans.append("]]}");
+            ans += "]]}";
         } else {
-            ans = new StringBuilder("{[]}");
+            ans = "{[]}";
         }
 
-        return ans.toString();
+        return ans;
     }
 
     public int getIdEnterprise(int idDono, String name, int indice) {
@@ -217,6 +216,7 @@ public class MyFoodSystem {
         }
 
         List<Enterprise> enterprisesList = enterprises.get(idDono);
+
         int count = 0;
         for (Enterprise enterprise : enterprisesList) {
             if (enterprise.getDono() == idDono && enterprise.getName().equals(name)){
@@ -275,17 +275,21 @@ public class MyFoodSystem {
         for (ArrayList<Enterprise> enterpriseList : enterprises.values()) {
             for (Enterprise e : enterpriseList) {
                 if (e.getId() == id) {
-                    return switch (attribute) {
-                        case "endereco" -> e.getAddress();
-                        case "nome" -> e.getName();
-                        case "dono" -> {
+                    switch (attribute) {
+                        case "endereco":
+                            return e.getAddress();
+                        case "nome":
+                            return e.getName();
+                        case "dono":
                             User user = getUserById(e.getDono());
-                            yield user != null ? user.getName() : "Desconhecido";
-                        }
-                        case "tipoCozinha" -> e.getTypeKitchen();
-                        case "tipoEmpresa" -> e.getTypeEnterprise();
-                        default -> throw new IllegalArgumentException("Atributo invalido");
-                    };
+                            return user != null ? user.getName() : "Desconhecido";
+                        case "tipoCozinha":
+                            return e.getTypeKitchen();
+                        case "tipoEmpresa":
+                            return e.getTypeEnterprise();
+                        default:
+                            throw new IllegalArgumentException("Atributo invalido");
+                    }
                 }
             }
         }
@@ -419,22 +423,22 @@ public class MyFoodSystem {
         }
 
         ArrayList<Product> productsList = products.get(enterprise);
-        StringBuilder ans = new StringBuilder("{[");
+        String ans = "{[";
 
         if(productsList == null) {
-            ans = new StringBuilder("{[]}");
-            return ans.toString();
+            ans = "{[]}";
+            return ans;
         }
 
         for(Product product : productsList) {
-            ans.append(product.getName());
+            ans += product.getName();
             if(product != productsList.get(productsList.size() - 1)) {
-                ans.append(", ");
+                ans += ", ";
             }
         }
+        ans += "]}";
 
-        ans.append("]}");
-        return ans.toString();
+        return ans;
     }
 
     public int createOrder(int clientId, int enterpriseId) {
@@ -478,47 +482,47 @@ public class MyFoodSystem {
         ShoppingCart shoppingCart = shoppingCarts.stream().filter(cart -> cart.getOrderId() == orderId)
                                     .findFirst().orElseThrow(() -> new IllegalArgumentException("Nao existe pedido em aberto"));
 
-        switch (attribute) {
-            case "cliente" -> {
-                User user = users.stream().filter(u -> u.getId() == shoppingCart.getClientId()).findFirst().orElse(null);
-                assert user != null;
-                return user.getName();
-            }
-            case "empresa" -> {
-                for (ArrayList<Enterprise> enterpriseList : enterprises.values()) {
-                    Enterprise enterprise = enterpriseList.stream().filter(e -> e.getId() == shoppingCart.getEnterpriseId()).findFirst().orElse(null);
-                    if (enterprise != null) {
-                        return enterprise.getName();
-                    }
+        if(attribute.equals("cliente")) {
+            User user = users.stream().filter(u -> u.getId() == shoppingCart.getClientId()).findFirst().orElse(null);
+            return user.getName();
+        }
+        else if(attribute.equals("empresa")) {
+            for(ArrayList<Enterprise> enterpriseList : enterprises.values()){
+                Enterprise enterprise = enterpriseList.stream().filter(e -> e.getId() == shoppingCart.getEnterpriseId()).findFirst().orElse(null);
+                if(enterprise != null) {
+                    return enterprise.getName();
                 }
             }
-            case "estado" -> {
-                if (shoppingCart.isOpenOrder()) {
-                    return "aberto";
-                } else {
-                    return "preparando";
-                }
+        }
+        else if(attribute.equals("estado")) {
+            if(shoppingCart.isOpenOrder()) {
+                return "aberto";
             }
-            case "produtos" -> {
-                ArrayList<Product> productList = shoppingCart.getProducts();
+            else {
+                return "preparando";
+            }
+        }
+        else if(attribute.equals("produtos")) {
+            ArrayList<Product> productList = shoppingCart.getProducts();
 
-                StringBuilder ans = new StringBuilder("{[");
-                boolean first = true;
-                for (Product product : productList) {
-                    if (!first) {
-                        ans.append(", ");
-                    }
-                    first = false;
-
-                    ans.append(product.getName());
+            String ans = "{[";
+            boolean first = true;
+            for(Product product : productList) {
+                if(!first) {
+                    ans += ", ";
                 }
-                ans.append("]}");
-                return ans.toString();
+                first = false;
+
+                ans += product.getName();
             }
-            case "valor" -> {
-                return String.format("%.2f", shoppingCart.getTotalPrice());
-            }
-            default -> throw new IllegalArgumentException("Atributo nao existe");
+            ans += "]}";
+            return ans;
+        }
+        else if(attribute.equals("valor")) {
+            return String.format("%.2f", shoppingCart.getTotalPrice());
+        }
+        else {
+            throw new IllegalArgumentException("Atributo nao existe");
         }
         return null;
     }
@@ -549,12 +553,4 @@ public class MyFoodSystem {
 
         shoppingCart.removeProduct(productToRemove);
     }
-
-    public int getOrderId(int clientId, int enterpriseId, int index) {
-        List<ShoppingCart> shoppingCart = shoppingCarts.stream()
-                                        .filter(cart -> cart.getClientId() == clientId && cart.getEnterpriseId() == enterpriseId)
-                                        .toList();
-        return shoppingCart.get(index).getOrderId();
-    }
-
 }
