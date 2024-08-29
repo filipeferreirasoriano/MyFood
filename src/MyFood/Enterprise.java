@@ -1,6 +1,5 @@
 package MyFood;
 
-
 import java.util.UUID;
 
 public class Enterprise {

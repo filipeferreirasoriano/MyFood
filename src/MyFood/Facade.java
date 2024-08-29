@@ -1,10 +1,4 @@
 package MyFood;
-import MyFood.Product.Product;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
 
 public class Facade {
     private final MyFoodSystem system;
