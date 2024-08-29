@@ -36,6 +36,7 @@ public class MyFoodSystem {
         users.clear();
         enterprises.clear();
         products.clear();
+        shoppingCarts.clear();
         saveData();
     }
 
@@ -45,6 +46,7 @@ public class MyFoodSystem {
             encoder.writeObject(users);
             encoder.writeObject(enterprises);
             encoder.writeObject(products);
+            encoder.writeObject(shoppingCarts);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -56,10 +58,12 @@ public class MyFoodSystem {
             users = (ArrayList<User>) decoder.readObject();
             enterprises = (HashMap<Integer, ArrayList<Enterprise>>) decoder.readObject();
             products = (HashMap<Integer, ArrayList<Product>>) decoder.readObject();
+            shoppingCarts = (ArrayList<ShoppingCart>) decoder.readObject();
         } catch (Exception e) {
             users = new ArrayList<>();
             enterprises = new HashMap<>();
             products = new HashMap<>();
+            shoppingCarts = new ArrayList<>();
         }
     }
 
@@ -552,5 +556,11 @@ public class MyFoodSystem {
                                     .findFirst().orElseThrow(() -> new IllegalArgumentException("Produto nao encontrado"));
 
         shoppingCart.removeProduct(productToRemove);
+    }
+
+    public int getOrderId(int clientId, int enterpriseId, int index) {
+        List<ShoppingCart> shoppingCart = shoppingCarts.stream().filter(cart -> cart.getClientId() == clientId && cart.getEnterpriseId() == enterpriseId)
+                                            .toList();
+        return shoppingCart.get(index).getOrderId();
     }
 }

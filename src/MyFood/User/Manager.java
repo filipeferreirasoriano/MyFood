@@ -11,6 +11,14 @@ public class Manager extends User {
 
     }
 
+    public String getCpf() {
+        return cpf;
+    }
+
+    public void setCpf(String cpf) {
+        this.cpf = cpf;
+    }
+
     @Override
     public String getAtribute(String nomeAtributo) {
         if ("cpf".equals(nomeAtributo)) {

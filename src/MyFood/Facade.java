@@ -88,4 +88,8 @@ public class Facade {
     public void removerProduto(int orderId, String product) {
         system.removeProductFromShoppingCart(orderId, product);
     }
+
+    public int getNumeroPedido(int clientId, int enterpriseId, int index) {
+        return system.getOrderId(clientId, enterpriseId, index);
+    }
 }
