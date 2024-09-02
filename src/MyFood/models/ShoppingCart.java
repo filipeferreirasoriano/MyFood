@@ -1,6 +1,4 @@
-package MyFood.Order;
-
-import MyFood.Product.Product;
+package MyFood.models;
 
 import java.util.ArrayList;
 import java.util.UUID;

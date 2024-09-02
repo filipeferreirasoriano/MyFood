@@ -1,6 +1,5 @@
-package MyFood.Product;
+package MyFood.models;
 
-import java.math.BigDecimal;
 import java.util.UUID;
 
 public class Product {

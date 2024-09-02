@@ -1,4 +1,4 @@
-package MyFood;
+package MyFood.models;
 
 import java.util.UUID;
 

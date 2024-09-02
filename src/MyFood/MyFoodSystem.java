@@ -1,10 +1,7 @@
 package MyFood;
 
 import MyFood.Exceptions.*;
-import MyFood.Order.ShoppingCart;
-import MyFood.Product.Product;
-import MyFood.User.Manager;
-import MyFood.User.User;
+import MyFood.models.*;
 
 import java.beans.XMLEncoder;
 import java.beans.XMLDecoder;

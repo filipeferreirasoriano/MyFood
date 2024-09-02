@@ -1,4 +1,4 @@
-package MyFood.User;
+package MyFood.models;
 
 public class Manager extends User {
     private String cpf;
