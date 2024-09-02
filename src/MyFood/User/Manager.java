@@ -27,5 +27,4 @@ public class Manager extends User {
             return super.getAtribute(nomeAtributo);
         }
     }
-
 }

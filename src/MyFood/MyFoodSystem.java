@@ -70,12 +70,7 @@ public class MyFoodSystem {
 // Gerenciamento de usuários
 
     public User getUserById(int id) {
-        for (User user : users) {
-            if (user.getId() == id) {
-                return user;
-            }
-        }
-        return null;
+        return users.stream().filter(user -> user.getId() == id).findFirst().orElse(null);
     }
 
     public String getAtributoUser(int id, String nomeAtributo) {
@@ -212,9 +207,7 @@ public class MyFoodSystem {
             throw new IndiceInvalidoException();
         }
 
-//        System.out.println(idDono);
         List<Enterprise> enterprisesList = enterprises.get(idDono);
-//        System.out.println(enterprisesList.size());
         if(enterprisesList == null) {
             return 0;
         }
