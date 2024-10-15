@@ -19,10 +19,10 @@ public class Main {
         tests.add("tests/us4_1.txt");
         tests.add("tests/us4_2.txt");
         tests.add("tests/us5_1.txt");
-//        tests.add("tests/us5_2.txt");
-//        tests.add("tests/us6_1.txt");
-//        tests.add("tests/us6_2.txt");
-//        tests.add("tests/us7_1.txt");
+        tests.add("tests/us5_2.txt");
+        tests.add("tests/us6_1.txt");
+        tests.add("tests/us6_2.txt");
+        tests.add("tests/us7_1.txt");
 //        tests.add("tests/us7_2.txt");
 //        tests.add("tests/us8_1.txt");
 //        tests.add("tests/us8_2.txt");

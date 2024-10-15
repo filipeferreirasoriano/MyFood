@@ -1,5 +1,7 @@
 package MyFood.models;
 
+import MyFood.Exceptions.AtributoInvalidoException;
+
 import java.util.UUID;
 
 public class Enterprise {
@@ -73,8 +75,17 @@ public class Enterprise {
         return type;
     }
 
-    public void setTypeKitchen(String type) {
+    public void setType(String type) {
         this.type = type;
     }
 
+    public String getAttribute(String attribute, User manager) {
+        return switch (attribute) {
+            case "endereco" -> getAddress();
+            case "nome" -> getName();
+            case "dono" -> manager != null ? manager.getName() : "Desconhecido";
+            case "tipoEmpresa" -> getTypeEnterprise();
+            default -> throw new AtributoInvalidoException();
+        };
+    }
 }

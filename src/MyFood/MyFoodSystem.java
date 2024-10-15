@@ -8,15 +8,11 @@ import java.beans.XMLDecoder;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
-import java.util.regex.Pattern;
 
 public class MyFoodSystem {
 
@@ -108,6 +104,16 @@ public class MyFoodSystem {
         saveData();
     }
 
+    public void createUser(String name, String email, String password, String address, String vehicle, String licensePlate) {
+        validateUser(name, email, password, address, vehicle, licensePlate);
+        if (emailExist(email)) {
+            throw new EmailjaExiteException();
+        }
+        DeliveryMan deliveryMan = new DeliveryMan(name, email, password, address, vehicle, licensePlate);
+        users.add(deliveryMan);
+        saveData();
+    }
+
     public int login(String email, String password) {
         if(email == null || password == null || email.isEmpty() || password.isEmpty()) {
             throw new LoginOuSenhaInvalidosExcepiton();
@@ -145,6 +151,27 @@ public class MyFoodSystem {
         }
         if (address == null || address.trim().isEmpty()) {
             throw new EnderecoInvalidoException();
+        }
+    }
+
+    private void validateUser(String name, String email, String password, String address, String vehicle, String licensePlate) {
+        if (name == null || name.trim().isEmpty()) {
+            throw new NomeInvalidoException();
+        }
+        if (email == null || !validateEmail(email)) {
+            throw new EmailInvalodoException();
+        }
+        if (password == null || password.trim().isEmpty()) {
+            throw new SenhaInvalidaException();
+        }
+        if (address == null || address.trim().isEmpty()) {
+            throw new EnderecoInvalidoException();
+        }
+        if(vehicle == null || vehicle.trim().isEmpty()) {
+            throw new VeiculoInvalidoException();
+        }
+        if (licensePlate == null || licensePlate.trim().isEmpty()) {
+            throw new PlacaInvalidaException();
         }
     }
 
@@ -247,25 +274,23 @@ public class MyFoodSystem {
         }
     }
 
-//    public int createEnterprise(String typeEnterprise, int dono, String name,String address, Boolean aberto24Horas, int numeroFuncionarios) {
-//
-//          validateEnterprise(typeEnterprise, dono, name, address);
-//        ArrayList<Enterprise> managerEnterprises = getEnterprises(dono);
-//        Enterprise enterprise = new Farmacia(typeEnterprise, dono, name, address,aberto24Horas,numeroFuncionarios);
-//        managerEnterprises.add(enterprise);
-//        enterprises.put(dono, managerEnterprises);
-//
-//        return enterprise.getId();
-//    }
+    public int createEnterprise(String typeEnterprise, int dono, String name,String address, Boolean aberto24Horas, int numeroFuncionarios) {
+
+        validateEnterprise(typeEnterprise, dono, name, address);
+        ArrayList<Enterprise> managerEnterprises = getEnterprises(dono);
+        Enterprise enterprise = new Farmacia(typeEnterprise, dono, name, address,aberto24Horas,numeroFuncionarios);
+        managerEnterprises.add(enterprise);
+        enterprises.put(dono, managerEnterprises);
+
+        return enterprise.getId();
+    }
 
     public int createEnterprise(String typeEnterprise, int dono, String name, String address, String abre, String fecha, String type) {
+        validDate(abre, fecha);
 
-        LocalTime open = validDate(abre);
-        LocalTime close = validDate(fecha);
-
-        validateEnterprise(typeEnterprise,dono,name,address,open,close,type);
+        validateEnterprise(typeEnterprise,dono,name,address,abre,fecha,type);
         ArrayList<Enterprise> managerEnterprises = getEnterprises(dono);
-        Enterprise enterprise = new Mercado(typeEnterprise, dono, name, address,type, open, close);
+        Mercado enterprise = new Mercado(typeEnterprise, dono, name, address,type, abre, fecha);
         managerEnterprises.add(enterprise);
         enterprises.put(dono, managerEnterprises);
         return enterprise.getId();
@@ -274,16 +299,15 @@ public class MyFoodSystem {
 
     public int createEnterprise(String typeEnterprise, int dono, String name, String address, String typeKitchen) {
 
-        validateEnterprise(typeEnterprise, dono, name, address, typeKitchen);
+        validateEnterprise(typeEnterprise, dono, name, address);
         ArrayList<Enterprise> managerEnterprises = getEnterprises(dono);
         Enterprise enterprise = new Restaurante(typeEnterprise, dono, name, address, typeKitchen);
         managerEnterprises.add(enterprise);
         enterprises.put(dono, managerEnterprises);
-
         return enterprise.getId();
     }
 
-    public void validateEnterprise(String typeEnterprise, int dono, String name, String address, String typeKitchen) {
+    public void validateEnterprise(String typeEnterprise, int dono, String name, String address) {
         User user = getUserById(dono);
         if (user == null || user.getAtribute("cpf") == null) {
             throw new UsuarioNaoPodeCriarEmpresaException();
@@ -291,24 +315,35 @@ public class MyFoodSystem {
         if(typeEnterprise == null || typeEnterprise.trim().isEmpty()) {
             throw new TipodeEmpresaInvalidoException();
         }
+        if(name == null || name.trim().isEmpty()) {
+            throw new NomeInvalidoException();
+        }
+        if(address == null || address.trim().isEmpty()) {
+            throw new EnderecodeEmpresaInvalidoException();
+        }
         doesEnterpriseExist(dono, name, address);
     }
 
-    public LocalTime validDate(String hour) {
-
-        LocalTime hourTime;
+    public void validDate(String open, String close) {
         String regex = "^\\d{2}:\\d{2}$";
-        if(hour == null) throw new HorarioInvalidoException();
-        if(!hour.matches(regex)) throw new DataInvalidaException();
-        try {
-            hourTime = LocalTime.parse(hour, dateFormatHour);
-        } catch (DateTimeParseException e) {
+        if(open == null || close == null) throw new HorarioInvalidoException();
+        if(!open.matches(regex) || !close.matches(regex)) throw new DataInvalidaException();
+
+        String regexHour = "^([01]\\d|2[0-3]):[0-5]\\d$";
+
+        if(!open.matches(regexHour) || !close.matches(regexHour)) {
             throw new HorarioInvalidoException();
         }
-        return hourTime;
+
+        LocalTime openTime = LocalTime.parse(open, dateFormatHour);
+        LocalTime closeTime = LocalTime.parse(close, dateFormatHour);
+
+        if(openTime.isAfter(closeTime)) {
+            throw new HorarioInvalidoException();
+        }
     }
 
-    public void validateEnterprise(String typeEnterprise, int dono, String name, String address, LocalTime open, LocalTime close, String type) {
+    public void validateEnterprise(String typeEnterprise, int dono, String name, String address, String open, String close, String type) {
         User user = getUserById(dono);
 
         if (user == null || user.getAtribute("cpf") == null) {
@@ -331,12 +366,7 @@ public class MyFoodSystem {
             throw new TipodeEmpresaInvalidoException();
         }
 
-        if(open.isAfter(close)) {
-            throw new HorarioInvalidoException();
-        }
-
         doesEnterpriseExist(dono, name, address);
-
     }
 
     public String getAtributeEnterprise(int id, String attribute) {
@@ -346,22 +376,61 @@ public class MyFoodSystem {
         for (ArrayList<Enterprise> enterpriseList : enterprises.values()) {
             for (Enterprise e : enterpriseList) {
                 if (e.getId() == id) {
-                    return switch (attribute) {
-                        case "endereco" -> e.getAddress();
-                        case "nome" -> e.getName();
-                        case "dono" -> {
-                            User user = getUserById(e.getDono());
-                            yield user != null ? user.getName() : "Desconhecido";
-                        }
-                        case "tipoCozinha" -> e.getType();
-                        case "tipoEmpresa" -> e.getTypeEnterprise();
-                        default -> throw new AtributoInvalidoException();
-                    };
+                    User manager = getUserById(e.getDono());
+                    return e.getAttribute(attribute, manager);
                 }
             }
         }
         throw new EmpresaNaoCadastradaException();
     }
+
+    public void changeOperation(int empresa, String abre, String fecha)
+    {
+        validDate(abre, fecha);
+
+        boolean notMarket = true;
+        for(ArrayList<Enterprise> enterpriseList : enterprises.values()) {
+            for (Enterprise e : enterpriseList) {
+                if (e.getId() == empresa && e.getTypeEnterprise().equals("mercado")) {
+                    Mercado market = (Mercado) e;
+                    market.setAbre(abre);
+                    market.setFecha(fecha);
+                    notMarket = false;
+                }
+            }
+        }
+        if(notMarket) {
+            throw new MercadoInvalidoException();
+        }
+    }
+
+    //Gerenciamento de funcionarios
+
+    public void insertDeliveryMan(int enterpriseId, int deliveryManId) {
+        Farmacia enterprise = null;
+        for(ArrayList<Enterprise> enterpriseList : enterprises.values()) {
+            for (Enterprise e : enterpriseList) {
+                if (e.getId() == enterpriseId) {
+                    enterprise = (Farmacia)e;
+                }
+            }
+        }
+        DeliveryMan deliveryMan = null;
+        for(User user: users) {
+            if(user.getId() == deliveryManId) {
+                if(user.getClass().equals("class MyFood.models.DeliveryMan")) {
+                    deliveryMan = (DeliveryMan) user;
+                }
+                else {
+                    throw new NaoEntregadorException();
+                }
+            }
+        }
+        if(enterprise != null && deliveryMan != null) {
+            enterprise.addDeliveryMan(deliveryMan);
+        }
+    }
+
 
 // Gerenciamento de Produtos
 
@@ -523,7 +592,6 @@ public class MyFoodSystem {
         if(shoppingCarts.isEmpty()) {
             throw new NaoExistePedidoEmAbertoException();
         }
-
         ShoppingCart shoppingCart = shoppingCarts.stream()
                                     .filter(cart -> cart.getOrderId() == orderId)
                                     .findFirst()
