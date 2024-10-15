@@ -9,20 +9,27 @@ public class Enterprise {
     private String name;
     private String address;
     private String typeEnterprise;
-    private String typeKitchen;
-
+    private String type;
 
     public Enterprise() {
 
     }
 
-    public Enterprise(String typeEnterprise, int dono, String name, String address, String typeKitchen) {
+    public Enterprise(String typeEnterprise, int dono, String name, String address, String type) {
         this.id = UUID.randomUUID().hashCode();
         this.dono = dono;
         this.name = name;
         this.address = address;
         this.typeEnterprise = typeEnterprise;
-        this.typeKitchen = typeKitchen;
+        this.type = type;
+    }
+
+    public Enterprise(String typeEnterprise, int dono, String name, String address) {
+        this.id = UUID.randomUUID().hashCode();
+        this.dono = dono;
+        this.name = name;
+        this.address = address;
+        this.typeEnterprise = typeEnterprise;
     }
 
     public int getId() {
@@ -62,12 +69,12 @@ public class Enterprise {
         this.typeEnterprise = typeEnterprise;
     }
 
-    public String getTypeKitchen() {
-        return typeKitchen;
+    public String getType() {
+        return type;
     }
 
-    public void setTypeKitchen(String typeKitchen) {
-        this.typeKitchen = typeKitchen;
+    public void setTypeKitchen(String type) {
+        this.type = type;
     }
 
 }

@@ -38,6 +38,9 @@ public class Facade {
     public int criarEmpresa(String tipoEmpresa, int dono, String nome, String endereco, String tipoCozinha) {
         return system.createEnterprise(tipoEmpresa, dono, nome, endereco, tipoCozinha);
     }
+    public int criarEmpresa(String tipoEmpresa, int dono, String nome, String endereco, String abre, String fecha, String tipoMercado) {
+        return system.createEnterprise(tipoEmpresa, dono, nome, endereco, abre, fecha, tipoMercado);
+    }
 
     public int getIdEmpresa (int idDono, String nome, int indice) {
         return system.getIdEnterprise(idDono, nome, indice);

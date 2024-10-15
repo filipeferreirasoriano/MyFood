@@ -8,9 +8,15 @@ import java.beans.XMLDecoder;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.regex.Pattern;
 
 public class MyFoodSystem {
 
@@ -18,6 +24,7 @@ public class MyFoodSystem {
     private ArrayList<ShoppingCart> shoppingCarts;
     private HashMap<Integer, ArrayList<Product>> products;
     private HashMap<Integer, ArrayList<Enterprise>> enterprises;
+    private static final DateTimeFormatter dateFormatHour = DateTimeFormatter.ofPattern("HH:mm");
 
 // Gerenciamento do sistema geral
 
@@ -240,11 +247,36 @@ public class MyFoodSystem {
         }
     }
 
-    public int createEnterprise(String typeEnterprise, int dono, String name, String address, String typeKitchen) {
-        validateEnterprise(typeEnterprise, dono, name, address, typeKitchen);
+//    public int createEnterprise(String typeEnterprise, int dono, String name,String address, Boolean aberto24Horas, int numeroFuncionarios) {
+//
+//          validateEnterprise(typeEnterprise, dono, name, address);
+//        ArrayList<Enterprise> managerEnterprises = getEnterprises(dono);
+//        Enterprise enterprise = new Farmacia(typeEnterprise, dono, name, address,aberto24Horas,numeroFuncionarios);
+//        managerEnterprises.add(enterprise);
+//        enterprises.put(dono, managerEnterprises);
+//
+//        return enterprise.getId();
+//    }
 
+    public int createEnterprise(String typeEnterprise, int dono, String name, String address, String abre, String fecha, String type) {
+
+        LocalTime open = validDate(abre);
+        LocalTime close = validDate(fecha);
+
+        validateEnterprise(typeEnterprise,dono,name,address,open,close,type);
         ArrayList<Enterprise> managerEnterprises = getEnterprises(dono);
-        Enterprise enterprise = new Enterprise(typeEnterprise, dono, name, address, typeKitchen);
+        Enterprise enterprise = new Mercado(typeEnterprise, dono, name, address,type, open, close);
+        managerEnterprises.add(enterprise);
+        enterprises.put(dono, managerEnterprises);
+        return enterprise.getId();
+
+    }
+
+    public int createEnterprise(String typeEnterprise, int dono, String name, String address, String typeKitchen) {
+
+        validateEnterprise(typeEnterprise, dono, name, address, typeKitchen);
+        ArrayList<Enterprise> managerEnterprises = getEnterprises(dono);
+        Enterprise enterprise = new Restaurante(typeEnterprise, dono, name, address, typeKitchen);
         managerEnterprises.add(enterprise);
         enterprises.put(dono, managerEnterprises);
 
@@ -256,7 +288,55 @@ public class MyFoodSystem {
         if (user == null || user.getAtribute("cpf") == null) {
             throw new UsuarioNaoPodeCriarEmpresaException();
         }
+        if(typeEnterprise == null || typeEnterprise.trim().isEmpty()) {
+            throw new TipodeEmpresaInvalidoException();
+        }
         doesEnterpriseExist(dono, name, address);
+    }
+
+    public LocalTime validDate(String hour) {
+
+        LocalTime hourTime;
+        String regex = "^\\d{2}:\\d{2}$";
+        if(hour == null) throw new HorarioInvalidoException();
+        if(!hour.matches(regex)) throw new DataInvalidaException();
+        try {
+            hourTime = LocalTime.parse(hour, dateFormatHour);
+        } catch (DateTimeParseException e) {
+            throw new HorarioInvalidoException();
+        }
+        return hourTime;
+    }
+
+    public void validateEnterprise(String typeEnterprise, int dono, String name, String address, LocalTime open, LocalTime close, String type) {
+        User user = getUserById(dono);
+
+        if (user == null || user.getAtribute("cpf") == null) {
+            throw new UsuarioNaoPodeCriarEmpresaException();
+        }
+
+        if(type == null || type.trim().isEmpty()) {
+            throw new TipoMercadoInvalidoExeption();
+        }
+
+        if(name == null || name.trim().isEmpty()) {
+            throw new NomeInvalidoException();
+        }
+
+        if(address == null || address.trim().isEmpty()) {
+            throw new EnderecodeEmpresaInvalidoException();
+        }
+
+        if(typeEnterprise == null || typeEnterprise.trim().isEmpty()) {
+            throw new TipodeEmpresaInvalidoException();
+        }
+
+        if(open.isAfter(close)) {
+            throw new HorarioInvalidoException();
+        }
+
+        doesEnterpriseExist(dono, name, address);
+
     }
 
     public String getAtributeEnterprise(int id, String attribute) {
@@ -273,7 +353,7 @@ public class MyFoodSystem {
                             User user = getUserById(e.getDono());
                             yield user != null ? user.getName() : "Desconhecido";
                         }
-                        case "tipoCozinha" -> e.getTypeKitchen();
+                        case "tipoCozinha" -> e.getType();
                         case "tipoEmpresa" -> e.getTypeEnterprise();
                         default -> throw new AtributoInvalidoException();
                     };
@@ -330,7 +410,6 @@ public class MyFoodSystem {
         if(value < 0) {
             throw new ValorInvalidoException();
         }
-
 
         Product current = null;
         for(ArrayList<Product> enterpriseProducts : products.values()) {
