@@ -21,6 +21,8 @@ public class MyFoodSystem {
     private HashMap<Integer, ArrayList<Product>> products;
     private HashMap<Integer, ArrayList<Enterprise>> enterprises;
     private static final DateTimeFormatter dateFormatHour = DateTimeFormatter.ofPattern("HH:mm");
+    private ArrayList<ShoppingCart> shoppingCartsReady;
+    private ArrayList<Delivery> deliveryList;
 
 // Gerenciamento do sistema geral
 
@@ -29,6 +31,8 @@ public class MyFoodSystem {
         enterprises = new HashMap<>();
         products = new HashMap<>();
         shoppingCarts = new ArrayList<>();
+        shoppingCartsReady = new ArrayList<>();
+        deliveryList = new ArrayList<>();
         loadData();
     }
 
@@ -658,11 +662,11 @@ public class MyFoodSystem {
         if(enterprises.get(clientId) != null) {
             throw new DonoNaoPodeFazerPedidoException();
         }
-        if(shoppingCarts.stream().anyMatch(shoppingCart -> shoppingCart.getClientId() == clientId && shoppingCart.getEnterpriseId() == enterpriseId && shoppingCart.isOpenOrder())) {
+        if(shoppingCarts.stream().anyMatch(shoppingCart -> shoppingCart.getClientId() == clientId && shoppingCart.getEnterpriseId() == enterpriseId && shoppingCart.getShoppingCartStatus() == ShoppingCartStatus.ABERTO)) {
             throw new DoisPedidosEmAbertoException();
         }
 
-        ShoppingCart shoppingCart = new ShoppingCart(clientId, enterpriseId);
+        ShoppingCart shoppingCart = new ShoppingCart(clientId, enterpriseId, ShoppingCartStatus.ABERTO);
         shoppingCarts.add(shoppingCart);
         return shoppingCart.getOrderId();
     }
@@ -676,7 +680,7 @@ public class MyFoodSystem {
                                     .findFirst()
                                     .orElseThrow(NaoExistePedidoEmAbertoException::new);
 
-        if(!shoppingCart.isOpenOrder()) {
+        if(shoppingCart.getShoppingCartStatus() != ShoppingCartStatus.ABERTO) {
             throw new AdicionarProdutosPedidoFechadoException();
         }
 
@@ -711,12 +715,7 @@ public class MyFoodSystem {
             }
         }
         else if(attribute.equals("estado")) {
-            if(shoppingCart.isOpenOrder()) {
-                return "aberto";
-            }
-            else {
-                return "preparando";
-            }
+            return shoppingCart.getShoppingCartStatus().toString();
         }
         else if(attribute.equals("produtos")) {
             ArrayList<Product> productList = shoppingCart.getProducts();
@@ -750,7 +749,7 @@ public class MyFoodSystem {
         if(shoppingCart == null) {
             throw new PedidoNaoEncontradoException();
         }
-        shoppingCart.setOpenOrder(false);
+        shoppingCart.setShoppingCartStatus(ShoppingCartStatus.PREPARANDO);
     }
 
     public void removeProductFromShoppingCart(int orderId, String product) {
@@ -761,7 +760,7 @@ public class MyFoodSystem {
         ShoppingCart shoppingCart = shoppingCarts.stream().filter(cart -> cart.getOrderId() == orderId)
                                     .findFirst().orElseThrow(NaoExistePedidoEmAbertoException::new);
 
-        if(!shoppingCart.isOpenOrder()) {
+        if(shoppingCart.getShoppingCartStatus() != ShoppingCartStatus.ABERTO) {
             throw new RemoverProdutosPedidoFechadoException();
         }
         ArrayList<Product> productList = shoppingCart.getProducts();
@@ -778,5 +777,139 @@ public class MyFoodSystem {
                         cart.getEnterpriseId() == enterpriseId)
                 .toList();
         return shoppingCart.get(index).getOrderId();
+    }
+
+    public void releaseOrder(int orderId) {
+        ShoppingCart shoppingCart = shoppingCarts.stream()
+                            .filter(cart -> cart.getOrderId() == orderId)
+                            .findFirst()
+                            .orElseThrow(PedidoNaoEncontradoException::new);
+
+        if(shoppingCart.getShoppingCartStatus() == ShoppingCartStatus.PRONTO) {
+            throw new PedidoJaLiberadoException();
+        }
+        if(shoppingCart.getShoppingCartStatus() != ShoppingCartStatus.PREPARANDO) {
+            throw new PedidoNaoPreparandoException();
+        }
+
+        shoppingCart.setShoppingCartStatus(ShoppingCartStatus.PRONTO);
+        shoppingCartsReady.add(shoppingCart);
+    }
+
+    public int getOrderByDeliveryMan(int deliveryManId) {
+        ArrayList<Enterprise> enterprisesDeliveryMan = getEnterprisesDeliveryMan(deliveryManId);
+        if(enterprisesDeliveryMan.isEmpty()) {
+            throw new EntregadorNaoEstaEmEmpresaException();
+        }
+
+        boolean enterpriseIsPharmacy = false;
+        ShoppingCart shoppingCart = null;
+        for(ShoppingCart cart: shoppingCartsReady) {
+            if(enterpriseIsPharmacy) {
+                break;
+            }
+            for(Enterprise enterprise: enterprisesDeliveryMan) {
+                if(cart.getEnterpriseId() == enterprise.getId() && enterprise.getTypeEnterprise().equals("farmacia")) {
+                    shoppingCart = cart;
+                    enterpriseIsPharmacy = true;
+                    break;
+                }
+                else if(cart.getEnterpriseId() == enterprise.getId() && shoppingCart == null) {
+                    shoppingCart = cart;
+                }
+            }
+        }
+
+        if(shoppingCart == null) {
+            return -1;
+        }
+        return shoppingCart.getOrderId();
+    }
+
+    public int createDelivery(int pedido, int entregador, String destino) {
+        ShoppingCart shoppingCart = null;
+        for(ShoppingCart cart: shoppingCarts) {
+            if(cart.getOrderId() == pedido) {
+                if(cart.getShoppingCartStatus() != ShoppingCartStatus.PRONTO) {
+                    throw new PedidoNaoProntoException();
+                }
+                shoppingCart = cart;
+            }
+        }
+
+        DeliveryMan deliveryMan = null;
+        for(User user: users) {
+            if(user.getId() == entregador) {
+                if(user.getType().equals("DeliveryMan")) {
+                    deliveryMan = (DeliveryMan)user;
+                }
+                else {
+                    throw new NaoEntregadorValidoException();
+                }
+                break;
+            }
+        }
+        if(deliveryMan.getInDelivery()) {
+            throw new EntregadorEmEntregaException();
+        }
+
+        if(destino == null || destino.trim().isEmpty()) {
+            destino = getUserById(shoppingCart.getClientId()).getAddress();
+        }
+
+        if(shoppingCart != null && deliveryMan != null) {
+            shoppingCartsReady.remove(shoppingCart);
+            deliveryMan.setInDelivery(true);
+
+            Delivery delivery = new Delivery(shoppingCart, deliveryMan, destino);
+            deliveryList.add(delivery);
+
+            shoppingCart.setShoppingCartStatus(ShoppingCartStatus.ENTREGANDO);
+
+            return delivery.getId();
+        }
+        return 0;
+    }
+
+    public String getDeliveryAttribute(int deliveryId, String attribute) {
+        if(attribute == null || attribute.trim().isEmpty()) {
+            throw new AtributoInvalidoException();
+        }
+
+        Delivery delivery = null;
+        for(Delivery delivery2: deliveryList) {
+            if (delivery2.getId() == deliveryId) {
+                delivery = delivery2;
+            }
+        }
+
+        return switch (attribute) {
+            case "cliente" -> getUserById(delivery.getShoppingCart().getClientId()).getName();
+            case "empresa" -> getEnterprise(delivery.getShoppingCart().getEnterpriseId()).getName();
+            case "pedido" -> String.valueOf(delivery.getShoppingCart().getOrderId());
+            case "entregador" -> delivery.getDeliveryMan().getName();
+            case "destino" -> delivery.getAddress();
+            default -> throw new AtributoNaoExisteException();
+        };
+//        public String getAttribute(String attribute) {
+//            if (attribute.equals("cliente")) {
+//                return String.valueOf(shoppingCart.getClientId());
+//            }
+//            else if (attribute.equals("empresa")) {
+//                return String.valueOf(shoppingCart.getEnterpriseId());
+//            }
+//            else if (attribute.equals("pedido")) {
+//                return String.valueOf(shoppingCart.getOrderId());
+//            }
+//            else if (attribute.equals("entregador")) {
+//                return String.valueOf(deliveryMan.getId());
+//            }
+//            else if (attribute.equals("destino")) {
+//                return address;
+//            }
+//            else {
+//                throw new AtributoNaoExisteException();
+//            }
+//        }
     }
 }

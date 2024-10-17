@@ -3,6 +3,7 @@ package MyFood.models;
 public class DeliveryMan extends User {
     private String vehicle;
     private String licensePlate;
+    private Boolean inDelivery;
 
     public DeliveryMan() {
         super();
@@ -12,6 +13,7 @@ public class DeliveryMan extends User {
         super(name, email, password, address);
         this.vehicle = vehicle;
         this.licensePlate = licensePlate;
+        inDelivery = false;
         this.setType("DeliveryMan");
     }
 
@@ -29,6 +31,14 @@ public class DeliveryMan extends User {
 
     public void setLicensePlate(String licensePlate) {
         this.licensePlate = licensePlate;
+    }
+
+    public Boolean getInDelivery() {
+        return inDelivery;
+    }
+
+    public void setInDelivery(Boolean inDelivery) {
+        this.inDelivery = inDelivery;
     }
 
     @Override

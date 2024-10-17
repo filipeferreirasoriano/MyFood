@@ -7,18 +7,18 @@ public class ShoppingCart {
     private int clientId;
     private int enterpriseId;
     private int orderId;
-    private boolean openOrder;
+    private ShoppingCartStatus shoppingCartStatus;
     private ArrayList<Product> products;
 
     public ShoppingCart() {
 
     }
 
-    public ShoppingCart(int clientId, int enterpriseId) {
+    public ShoppingCart(int clientId, int enterpriseId, ShoppingCartStatus shoppingCartStatus) {
         this.clientId = clientId;
         this.enterpriseId = enterpriseId;
         this.orderId = UUID.randomUUID().hashCode();
-        openOrder = true;
+        this.shoppingCartStatus = shoppingCartStatus;
         this.products = new ArrayList<>();
     }
 
@@ -32,10 +32,6 @@ public class ShoppingCart {
 
     public int getEnterpriseId() {
         return enterpriseId;
-    }
-
-    public boolean isOpenOrder() {
-        return openOrder;
     }
 
     public void setEnterpriseId(int enterpriseId) {
@@ -58,8 +54,12 @@ public class ShoppingCart {
         this.products = products;
     }
 
-    public void setOpenOrder(boolean openOrder) {
-        this.openOrder = openOrder;
+    public ShoppingCartStatus getShoppingCartStatus() {
+        return shoppingCartStatus;
+    }
+
+    public void setShoppingCartStatus(ShoppingCartStatus shoppingCartStatus) {
+        this.shoppingCartStatus = shoppingCartStatus;
     }
 
     public void addProduct(Product product) {

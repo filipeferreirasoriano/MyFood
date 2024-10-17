@@ -106,6 +106,22 @@ public class Facade {
         return system.getOrderId(clientId, enterpriseId, index);
     }
 
+    public void liberarPedido(int orderId) {
+        system.releaseOrder(orderId);
+    }
+
+    public int obterPedido(int entregador) {
+        return system.getOrderByDeliveryMan(entregador);
+    }
+
+    public int criarEntrega(int pedido, int entregador, String destino) {
+        return system.createDelivery(pedido, entregador, destino);
+    }
+
+    public String getEntrega(int id, String atributo) {
+        return system.getDeliveryAttribute(id, atributo);
+    }
+
     public String getEntregadores(int empresa) {
         return system.getDeliveryMen(empresa);
     }

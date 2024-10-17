@@ -18,7 +18,7 @@ public class Enterprise {
         this.deliveryMen = new ArrayList<>();
     }
 
-    public Enterprise(String typeEnterprise,int dono,String name,String address,String type) {
+    public Enterprise(String typeEnterprise, int dono, String name, String address, String type) {
         this.id = UUID.randomUUID().hashCode();
         this.dono = dono;
         this.name = name;
