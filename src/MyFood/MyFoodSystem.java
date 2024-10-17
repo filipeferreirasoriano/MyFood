@@ -428,7 +428,6 @@ public class MyFoodSystem {
             enterprise.addDeliveryMan(deliveryMan);
             deliveryMan.addEnterprise(enterprise);
         }
-        saveData();
     }
 
     public String getEnterprisesDeliveryManString(int id) {
@@ -487,15 +486,15 @@ public class MyFoodSystem {
         return enterprise;
     }
 
-    public String getDeliveryMans(int enterpriseId) {
+    public String getDeliveryMen(int enterpriseId) {
         Enterprise enterprise = getEnterprise(enterpriseId);
         if (enterprise == null) return "{[]}";
 
         StringBuilder ans = new StringBuilder("{[");
         boolean hasDeliveryMan = false;
 
-        ArrayList<DeliveryMan> deliveryMans = enterprise.getDeliveryMans();
-        for (DeliveryMan dm : deliveryMans) {
+        ArrayList<DeliveryMan> deliveryMen = enterprise.getDeliveryMans();
+        for (DeliveryMan dm : deliveryMen) {
             if (hasDeliveryMan) {
                 ans.append(", ");
             }

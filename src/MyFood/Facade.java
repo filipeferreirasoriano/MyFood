@@ -107,7 +107,7 @@ public class Facade {
     }
 
     public String getEntregadores(int empresa) {
-        return system.getDeliveryMans(empresa);
+        return system.getDeliveryMen(empresa);
     }
 
     public String getEmpresas(int entregador) {

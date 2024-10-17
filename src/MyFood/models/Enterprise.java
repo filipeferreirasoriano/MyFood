@@ -12,10 +12,10 @@ public class Enterprise {
     private String name;
     private String address;
     private String typeEnterprise;
-    private final ArrayList<DeliveryMan> deliveryMans;
+    private ArrayList<DeliveryMan> deliveryMen;
 
     public Enterprise() {
-        this.deliveryMans = new ArrayList<>();
+        this.deliveryMen = new ArrayList<>();
     }
 
     public Enterprise(String typeEnterprise,int dono,String name,String address,String type) {
@@ -25,7 +25,7 @@ public class Enterprise {
         this.address = address;
         this.typeEnterprise = typeEnterprise;
         this.type = type;
-        this.deliveryMans = new ArrayList<>();
+        this.deliveryMen = new ArrayList<>();
     }
 
     public Enterprise(String typeEnterprise, int dono, String name, String address) {
@@ -34,7 +34,7 @@ public class Enterprise {
         this.name = name;
         this.address = address;
         this.typeEnterprise = typeEnterprise;
-        this.deliveryMans = new ArrayList<>();
+        this.deliveryMen = new ArrayList<>();
     }
 
     public int getId() {
@@ -82,6 +82,7 @@ public class Enterprise {
         this.type = type;
     }
 
+
     public String getAttribute(String attribute, User manager) {
         return switch (attribute) {
             case "endereco" -> getAddress();
@@ -92,11 +93,15 @@ public class Enterprise {
         };
     }
 
+    public void setDeliveryMans(ArrayList<DeliveryMan> deliveryMen) {
+        this.deliveryMen = deliveryMen;
+    }
+
     public ArrayList<DeliveryMan> getDeliveryMans() {
-        return deliveryMans;
+        return deliveryMen;
     }
 
     public void addDeliveryMan(DeliveryMan deliveryMan) {
-        deliveryMans.add(deliveryMan);
+        deliveryMen.add(deliveryMan);
     }
 }
