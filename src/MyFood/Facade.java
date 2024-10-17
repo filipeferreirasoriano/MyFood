@@ -105,4 +105,12 @@ public class Facade {
     public int getNumeroPedido(int clientId, int enterpriseId, int index) {
         return system.getOrderId(clientId, enterpriseId, index);
     }
+
+    public String getEntregadores(int empresa) {
+        return system.getDeliveryMans(empresa);
+    }
+
+    public String getEmpresas(int entregador) {
+        return system.getEnterprisesDeliveryManString(entregador);
+    }
 }

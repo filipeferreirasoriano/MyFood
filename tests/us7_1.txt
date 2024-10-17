@@ -84,7 +84,7 @@ expect "Rodrigo" getAtributoUsuario id=${id1} atributo="nome"
 expect "rodrigo@ufal.com.br" getAtributoUsuario id=${id1} atributo="email"
 expect "Rua Exemplo N 123" getAtributoUsuario id=${id1} atributo="endereco"
 expect "moto" getAtributoUsuario id=${id1} atributo="veiculo" 
-expect "BRA 1234" getAtributoUsuario id=${id1} atributo="placa" 
+expect "BRA 1234" getAtributoUsuario id=${id1} atributo="placa"
 
 # Validando dados ao criar o usuário.
 expectError "Nome invalido" criarUsuario nome=  email="carlos@ufal.com.br" senha="123senha" endereco="Rua Exemplo N 123" veiculo="moto" placa="BRA 4567"

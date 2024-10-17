@@ -1,29 +1,31 @@
 package MyFood.models;
 
 import MyFood.Exceptions.AtributoInvalidoException;
-
+import java.util.ArrayList;
 import java.util.UUID;
 
 public class Enterprise {
 
     private int id;
     private int dono;
+    private String type;
     private String name;
     private String address;
     private String typeEnterprise;
-    private String type;
+    private final ArrayList<DeliveryMan> deliveryMans;
 
     public Enterprise() {
-
+        this.deliveryMans = new ArrayList<>();
     }
 
-    public Enterprise(String typeEnterprise, int dono, String name, String address, String type) {
+    public Enterprise(String typeEnterprise,int dono,String name,String address,String type) {
         this.id = UUID.randomUUID().hashCode();
         this.dono = dono;
         this.name = name;
         this.address = address;
         this.typeEnterprise = typeEnterprise;
         this.type = type;
+        this.deliveryMans = new ArrayList<>();
     }
 
     public Enterprise(String typeEnterprise, int dono, String name, String address) {
@@ -32,6 +34,7 @@ public class Enterprise {
         this.name = name;
         this.address = address;
         this.typeEnterprise = typeEnterprise;
+        this.deliveryMans = new ArrayList<>();
     }
 
     public int getId() {
@@ -87,5 +90,13 @@ public class Enterprise {
             case "tipoEmpresa" -> getTypeEnterprise();
             default -> throw new AtributoInvalidoException();
         };
+    }
+
+    public ArrayList<DeliveryMan> getDeliveryMans() {
+        return deliveryMans;
+    }
+
+    public void addDeliveryMan(DeliveryMan deliveryMan) {
+        deliveryMans.add(deliveryMan);
     }
 }

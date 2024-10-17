@@ -5,13 +5,14 @@ public class DeliveryMan extends User {
     private String licensePlate;
 
     public DeliveryMan() {
-
+        super();
     }
 
     public DeliveryMan(String name, String email, String password, String address, String vehicle, String licensePlate) {
         super(name, email, password, address);
         this.vehicle = vehicle;
         this.licensePlate = licensePlate;
+        this.setType("DeliveryMan");
     }
 
     public String getVehicle() {
@@ -31,7 +32,7 @@ public class DeliveryMan extends User {
     }
 
     @Override
-    public String getAtribute(String nomeAtributo) {
+    public String getAttribute(String nomeAtributo) {
         if (nomeAtributo.equals("veiculo")) {
             return getVehicle();
         }
@@ -39,7 +40,7 @@ public class DeliveryMan extends User {
             return getLicensePlate();
         }
         else {
-            return super.getAtribute(nomeAtributo);
+            return super.getAttribute(nomeAtributo);
         }
     }
 }

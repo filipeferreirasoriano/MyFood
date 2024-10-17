@@ -20,11 +20,11 @@ public class Manager extends User {
     }
 
     @Override
-    public String getAtribute(String nomeAtributo) {
+    public String getAttribute(String nomeAtributo) {
         if ("cpf".equals(nomeAtributo)) {
             return this.cpf;
         } else {
-            return super.getAtribute(nomeAtributo);
+            return super.getAttribute(nomeAtributo);
         }
     }
 }

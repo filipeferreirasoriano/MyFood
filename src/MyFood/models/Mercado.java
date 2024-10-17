@@ -7,7 +7,7 @@ public class Mercado extends Enterprise {
     private String fecha;
 
     public Mercado() {
-
+        super();
     }
 
     public Mercado(String typeEnterprise, int dono, String name, String address, String type, String abre, String fecha) {

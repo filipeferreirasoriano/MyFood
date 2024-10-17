@@ -1,10 +1,9 @@
 package MyFood.models;
-
 import MyFood.Exceptions.AtributoInvalidoException;
 
 public class Restaurante extends Enterprise {
     public Restaurante() {
-
+        super();
     }
     public Restaurante(String name, int dono, String address, String typeEnterprise, String type) {
         super(name, dono, address, typeEnterprise, type);

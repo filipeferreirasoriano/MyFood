@@ -2,29 +2,18 @@ package MyFood.models;
 
 import MyFood.Exceptions.AtributoInvalidoException;
 
-import java.util.ArrayList;
-
 public class Farmacia extends Enterprise {
     private Boolean aberto24Horas;
     private int numeroFuncionarios;
-    private ArrayList<DeliveryMan> deliveryMans;
 
     public Farmacia() {
-
+        super();
     }
 
     public Farmacia(String typeEnterprise, int dono, String name, String address,Boolean aberto24Horas, int numeroFuncionarios) {
         super(typeEnterprise, dono, name, address);
         this.aberto24Horas = aberto24Horas;
         this.numeroFuncionarios = numeroFuncionarios;
-    }
-
-    public ArrayList<DeliveryMan> getDeliveryMans() {
-        return deliveryMans;
-    }
-
-    public void setDeliveryMans(ArrayList<DeliveryMan> deliveryMans) {
-        this.deliveryMans = deliveryMans;
     }
 
     public Boolean getAberto24Horas() {
@@ -43,9 +32,6 @@ public class Farmacia extends Enterprise {
         this.numeroFuncionarios = numeroFuncionarios;
     }
 
-    public void addDeliveryMan(DeliveryMan deliveryMan) {
-        this.deliveryMans.add(deliveryMan);
-    }
 
     @Override
     public String getAttribute(String attribute, User manager) {

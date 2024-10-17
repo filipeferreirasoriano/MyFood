@@ -78,7 +78,7 @@ public class MyFoodSystem {
         if (user == null) {
             throw new UsuarioNaoCadastradoException();
         }
-        return user.getAtribute(nomeAtributo);
+        return user.getAttribute(nomeAtributo);
     }
 
     public void createUser(String name, String email, String password, String address) {
@@ -100,6 +100,7 @@ public class MyFoodSystem {
             throw new EmailjaExiteException();
         }
         Manager manager = new Manager(name, email, password, address, cpf);
+        manager.setType("Manager");
         users.add(manager);
         saveData();
     }
@@ -110,6 +111,7 @@ public class MyFoodSystem {
             throw new EmailjaExiteException();
         }
         DeliveryMan deliveryMan = new DeliveryMan(name, email, password, address, vehicle, licensePlate);
+        deliveryMan.setType("DeliveryMan");
         users.add(deliveryMan);
         saveData();
     }
@@ -143,7 +145,7 @@ public class MyFoodSystem {
         if (name == null || name.trim().isEmpty()) {
             throw new NomeInvalidoException();
         }
-        if (email == null || !validateEmail(email)) {
+        if (email == null || validateEmail(email)) {
             throw new EmailInvalodoException();
         }
         if (password == null || password.trim().isEmpty()) {
@@ -158,7 +160,7 @@ public class MyFoodSystem {
         if (name == null || name.trim().isEmpty()) {
             throw new NomeInvalidoException();
         }
-        if (email == null || !validateEmail(email)) {
+        if (email == null || validateEmail(email)) {
             throw new EmailInvalodoException();
         }
         if (password == null || password.trim().isEmpty()) {
@@ -177,7 +179,7 @@ public class MyFoodSystem {
 
     private boolean validateEmail(String email) {
         String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
-        return email.matches(emailRegex);
+        return !email.matches(emailRegex);
     }
 
     private boolean validateCPF(String cpf) {
@@ -186,7 +188,7 @@ public class MyFoodSystem {
 
     public ArrayList<Enterprise> getEnterprises(int dono) {
         User user = getUserById(dono);
-        if (user == null || user.getAtribute("cpf") == null) {
+        if (user == null || user.getAttribute("cpf") == null) {
             throw new UsuarioNaoPodeCriarEmpresaException();
         }
 
@@ -202,7 +204,7 @@ public class MyFoodSystem {
 
     public String getEnterprisesHash(int dono) {
         User user = getUserById(dono);
-        if (user == null || user.getAtribute("cpf") == null) {
+        if (user == null || user.getAttribute("cpf") == null) {
             throw new UsuarioNaoPodeCriarEmpresaException();
         }
 
@@ -278,16 +280,16 @@ public class MyFoodSystem {
 
         validateEnterprise(typeEnterprise, dono, name, address);
         ArrayList<Enterprise> managerEnterprises = getEnterprises(dono);
-        Enterprise enterprise = new Farmacia(typeEnterprise, dono, name, address,aberto24Horas,numeroFuncionarios);
+        Farmacia enterprise = new Farmacia(typeEnterprise, dono, name, address,aberto24Horas,numeroFuncionarios);
         managerEnterprises.add(enterprise);
         enterprises.put(dono, managerEnterprises);
-
         return enterprise.getId();
+
     }
 
     public int createEnterprise(String typeEnterprise, int dono, String name, String address, String abre, String fecha, String type) {
-        validDate(abre, fecha);
 
+        validDate(abre, fecha);
         validateEnterprise(typeEnterprise,dono,name,address,abre,fecha,type);
         ArrayList<Enterprise> managerEnterprises = getEnterprises(dono);
         Mercado enterprise = new Mercado(typeEnterprise, dono, name, address,type, abre, fecha);
@@ -309,7 +311,7 @@ public class MyFoodSystem {
 
     public void validateEnterprise(String typeEnterprise, int dono, String name, String address) {
         User user = getUserById(dono);
-        if (user == null || user.getAtribute("cpf") == null) {
+        if (user == null || user.getAttribute("cpf") == null) {
             throw new UsuarioNaoPodeCriarEmpresaException();
         }
         if(typeEnterprise == null || typeEnterprise.trim().isEmpty()) {
@@ -346,7 +348,7 @@ public class MyFoodSystem {
     public void validateEnterprise(String typeEnterprise, int dono, String name, String address, String open, String close, String type) {
         User user = getUserById(dono);
 
-        if (user == null || user.getAtribute("cpf") == null) {
+        if (user == null || user.getAttribute("cpf") == null) {
             throw new UsuarioNaoPodeCriarEmpresaException();
         }
 
@@ -407,30 +409,108 @@ public class MyFoodSystem {
     //Gerenciamento de funcionarios
 
     public void insertDeliveryMan(int enterpriseId, int deliveryManId) {
-        Farmacia enterprise = null;
-        for(ArrayList<Enterprise> enterpriseList : enterprises.values()) {
-            for (Enterprise e : enterpriseList) {
-                if (e.getId() == enterpriseId) {
-                    enterprise = (Farmacia)e;
-                }
-            }
-        }
+
+        Enterprise enterprise = getEnterprise(enterpriseId);
         DeliveryMan deliveryMan = null;
-        for(User user: users) {
-            if(user.getId() == deliveryManId) {
-                if(user.getClass().equals("class MyFood.models.DeliveryMan")) {
+
+        for (User user : users) {
+            if (user.getId() == deliveryManId) {
+                if (user.getType().equals("DeliveryMan")) {
                     deliveryMan = (DeliveryMan) user;
-                }
-                else {
+                    break;
+                } else {
                     throw new NaoEntregadorException();
                 }
             }
         }
-        if(enterprise != null && deliveryMan != null) {
+
+        if (enterprise != null && deliveryMan != null) {
             enterprise.addDeliveryMan(deliveryMan);
+            deliveryMan.addEnterprise(enterprise);
         }
+        saveData();
     }
 
+    public String getEnterprisesDeliveryManString(int id) {
+        ArrayList<Enterprise> deliveryManEnterprises = getEnterprisesDeliveryMan(id);
+        if (deliveryManEnterprises.isEmpty()) {
+            return "{[]}";
+        }
+
+        StringBuilder ans = new StringBuilder("{[[");
+        boolean hasEnterprise = false;
+
+        for (Enterprise e : deliveryManEnterprises) {
+            if (hasEnterprise) {
+                ans.append("], [");
+            }
+            ans.append(e.getName()).append(", ").append(e.getAddress());
+            hasEnterprise = true;
+        }
+
+        ans.append("]]}");
+        return ans.toString();
+    }
+
+    private ArrayList<Enterprise> getEnterprisesDeliveryMan(int deliveryManID) {
+        DeliveryMan deliveryMan = null;
+
+        for (User user : users) {
+            if (user.getId() == deliveryManID && user.getType().equals("DeliveryMan")) {
+                deliveryMan = (DeliveryMan) user;
+                break;
+            }
+        }
+
+        if(deliveryMan == null) {
+            throw new NaoEntregadorException();
+        }
+
+        ArrayList<Enterprise> enterprises = deliveryMan.getEnterprises();
+        return (enterprises != null) ? enterprises : new ArrayList<>();
+
+    }
+
+    private Enterprise getEnterprise(int enterpriseId) {
+        Enterprise enterprise = null;
+        for (ArrayList<Enterprise> enterpriseList : enterprises.values()) {
+            for (Enterprise e : enterpriseList) {
+                if (e.getId() == enterpriseId) {
+                    switch (e.getTypeEnterprise()) {
+                        case "mercado" -> enterprise = (Mercado) e;
+                        case "restaurante" -> enterprise = (Restaurante) e;
+                        case "farmacia" -> enterprise = (Farmacia) e;
+                    }
+                }
+            }
+        }
+        return enterprise;
+    }
+
+    public String getDeliveryMans(int enterpriseId) {
+        Enterprise enterprise = getEnterprise(enterpriseId);
+        if (enterprise == null) return "{[]}";
+
+        StringBuilder ans = new StringBuilder("{[");
+        boolean hasDeliveryMan = false;
+
+        ArrayList<DeliveryMan> deliveryMans = enterprise.getDeliveryMans();
+        for (DeliveryMan dm : deliveryMans) {
+            if (hasDeliveryMan) {
+                ans.append(", ");
+            }
+            ans.append(dm.getEmail());
+            hasDeliveryMan = true;
+        }
+
+        if (hasDeliveryMan) {
+            ans.append("]}");
+        } else {
+            ans = new StringBuilder("{[]}");
+        }
+
+        return ans.toString();
+    }
 
 // Gerenciamento de Produtos
 
@@ -624,7 +704,8 @@ public class MyFoodSystem {
         }
         else if(attribute.equals("empresa")) {
             for(ArrayList<Enterprise> enterpriseList : enterprises.values()){
-                Enterprise enterprise = enterpriseList.stream().filter(e -> e.getId() == shoppingCart.getEnterpriseId()).findFirst().orElse(null);
+                Enterprise enterprise = enterpriseList.stream()
+                        .filter(e -> e.getId() == shoppingCart.getEnterpriseId()).findFirst().orElse(null);
                 if(enterprise != null) {
                     return enterprise.getName();
                 }
@@ -664,7 +745,9 @@ public class MyFoodSystem {
     }
 
     public void closeOrder(int orderId) {
-        ShoppingCart shoppingCart = shoppingCarts.stream().filter(cart -> cart.getOrderId() == orderId).findFirst().orElse(null);
+        ShoppingCart shoppingCart = shoppingCarts.stream()
+                .filter(cart -> cart.getOrderId() == orderId)
+                .findFirst().orElse(null);
         if(shoppingCart == null) {
             throw new PedidoNaoEncontradoException();
         }
@@ -691,8 +774,10 @@ public class MyFoodSystem {
     }
 
     public int getOrderId(int clientId, int enterpriseId, int index) {
-        List<ShoppingCart> shoppingCart = shoppingCarts.stream().filter(cart -> cart.getClientId() == clientId && cart.getEnterpriseId() == enterpriseId)
-                                            .toList();
+        List<ShoppingCart> shoppingCart = shoppingCarts.stream()
+                .filter(cart -> cart.getClientId() == clientId &&
+                        cart.getEnterpriseId() == enterpriseId)
+                .toList();
         return shoppingCart.get(index).getOrderId();
     }
 }
