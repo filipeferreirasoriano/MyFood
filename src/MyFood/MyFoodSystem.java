@@ -383,7 +383,7 @@ public class MyFoodSystem {
         doesEnterpriseExist(dono, name, address);
     }
 
-    public String getAtributeEnterprise(int id, String attribute) {
+    public String getAttributeEnterprise(int id, String attribute) {
         if(attribute == null) {
             throw new AtributoInvalidoException();
         }
@@ -586,12 +586,12 @@ public class MyFoodSystem {
         }
     }
 
-    public String getProduto(String  name, int enterprise, String atribute) {
+    public String getProduto(String  name, int enterprise, String attribute) {
 
         if(name == null || name.trim().isEmpty()) {
             throw new NomeInvalidoException();
         }
-        if(atribute == null || atribute.trim().isEmpty()) {
+        if(attribute == null || attribute.trim().isEmpty()) {
             throw new AtributoInvalidoException();
         }
 
@@ -620,7 +620,7 @@ public class MyFoodSystem {
         if(currentEnterprise == null) {
             throw new ProdutoNaoEncontradoException();
         }
-        return switch (atribute) {
+        return switch (attribute) {
             case "nome" -> current.getName();
             case "valor" -> current.getValue().toString() + "0";
             case "categoria" -> current.getCategory();

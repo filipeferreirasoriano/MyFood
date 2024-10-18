@@ -59,7 +59,7 @@ public class Facade {
     }
 
     public String getAtributoEmpresa(int id, String nomeAtributo) {
-        return system.getAtributeEnterprise(id, nomeAtributo);
+        return system.getAttributeEnterprise(id, nomeAtributo);
     }
 
     public void alterarFuncionamento(int id, String abre, String fecha){
@@ -74,8 +74,8 @@ public class Facade {
         system.editProduct(id, nome, valor, categoria);
     }
 
-    public String getProduto(String  name, int enterprise, String atribute) {
-        return system.getProduto(name, enterprise, atribute);
+    public String getProduto(String  name, int enterprise, String attribute) {
+        return system.getProduto(name, enterprise, attribute);
     }
 
     public String listarProdutos(int enterprise) {
