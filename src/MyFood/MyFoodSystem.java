@@ -24,7 +24,7 @@ public class MyFoodSystem {
     private ArrayList<ShoppingCart> shoppingCartsReady;
     private ArrayList<Delivery> deliveryList;
 
-// Gerenciamento do sistema geral
+    // Gerenciamento do sistema geral
 
     public MyFoodSystem() {
         users = new ArrayList<>();
@@ -41,6 +41,8 @@ public class MyFoodSystem {
         enterprises.clear();
         products.clear();
         shoppingCarts.clear();
+        shoppingCartsReady.clear();
+        deliveryList.clear();
         saveData();
     }
 
@@ -51,6 +53,8 @@ public class MyFoodSystem {
             encoder.writeObject(enterprises);
             encoder.writeObject(products);
             encoder.writeObject(shoppingCarts);
+            encoder.writeObject(shoppingCartsReady);
+            encoder.writeObject(deliveryList);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -63,11 +67,15 @@ public class MyFoodSystem {
             enterprises = (HashMap<Integer, ArrayList<Enterprise>>) decoder.readObject();
             products = (HashMap<Integer, ArrayList<Product>>) decoder.readObject();
             shoppingCarts = (ArrayList<ShoppingCart>) decoder.readObject();
+            shoppingCartsReady = (ArrayList<ShoppingCart>) decoder.readObject();
+            deliveryList = (ArrayList<Delivery>) decoder.readObject();
         } catch (Exception e) {
             users = new ArrayList<>();
             enterprises = new HashMap<>();
             products = new HashMap<>();
             shoppingCarts = new ArrayList<>();
+            shoppingCartsReady = new ArrayList<>();
+            deliveryList = new ArrayList<>();
         }
     }
 
@@ -505,13 +513,11 @@ public class MyFoodSystem {
             ans.append(dm.getEmail());
             hasDeliveryMan = true;
         }
-
         if (hasDeliveryMan) {
             ans.append("]}");
         } else {
             ans = new StringBuilder("{[]}");
         }
-
         return ans.toString();
     }
 
@@ -821,7 +827,7 @@ public class MyFoodSystem {
         }
 
         if(shoppingCart == null) {
-            return -1;
+            throw new NaoExistePedidoException();
         }
         return shoppingCart.getOrderId();
     }
@@ -871,6 +877,43 @@ public class MyFoodSystem {
         return 0;
     }
 
+    public String getProductsOfDelivery(ArrayList<Product> products) {
+        if (products == null || products.isEmpty()) return "{[]}";
+
+        StringBuilder ans = new StringBuilder("{[");
+        boolean hasProduct = false;
+
+        for (Product product : products) {
+            if (hasProduct) {
+                ans.append(", ");
+            }
+            ans.append(product.getName());
+            hasProduct = true;
+        }
+        if (hasProduct) {
+            ans.append("]}");
+        } else {
+            ans = new StringBuilder("{[]}");
+        }
+        return ans.toString();
+    }
+
+    public int getIdDelivey(int orderId) {
+
+        Delivery delivery = null;
+        for(Delivery delivery2: deliveryList) {
+            if (delivery2.getShoppingCart().getOrderId() == orderId) {
+                delivery = delivery2;
+                break;
+            }
+        }
+        if(delivery == null) {
+            throw new IdEntregaNaoExisteException();
+        }
+
+        return delivery.getId();
+    }
+
     public String getDeliveryAttribute(int deliveryId, String attribute) {
         if(attribute == null || attribute.trim().isEmpty()) {
             throw new AtributoInvalidoException();
@@ -880,6 +923,7 @@ public class MyFoodSystem {
         for(Delivery delivery2: deliveryList) {
             if (delivery2.getId() == deliveryId) {
                 delivery = delivery2;
+                break;
             }
         }
 
@@ -889,27 +933,23 @@ public class MyFoodSystem {
             case "pedido" -> String.valueOf(delivery.getShoppingCart().getOrderId());
             case "entregador" -> delivery.getDeliveryMan().getName();
             case "destino" -> delivery.getAddress();
+            case "produtos" -> getProductsOfDelivery(delivery.getShoppingCart().getProducts());
             default -> throw new AtributoNaoExisteException();
         };
-//        public String getAttribute(String attribute) {
-//            if (attribute.equals("cliente")) {
-//                return String.valueOf(shoppingCart.getClientId());
-//            }
-//            else if (attribute.equals("empresa")) {
-//                return String.valueOf(shoppingCart.getEnterpriseId());
-//            }
-//            else if (attribute.equals("pedido")) {
-//                return String.valueOf(shoppingCart.getOrderId());
-//            }
-//            else if (attribute.equals("entregador")) {
-//                return String.valueOf(deliveryMan.getId());
-//            }
-//            else if (attribute.equals("destino")) {
-//                return address;
-//            }
-//            else {
-//                throw new AtributoNaoExisteException();
-//            }
-//        }
+    }
+
+    public void deliver(int deliveryId) {
+        boolean idExiste = false;
+        for(Delivery delivery2: deliveryList) {
+            if(delivery2.getId() == deliveryId) {
+                delivery2.getShoppingCart().setShoppingCartStatus(ShoppingCartStatus.ENTREGUE);
+                delivery2.getDeliveryMan().setInDelivery(false);
+                idExiste = true;
+                break;
+            }
+        }
+        if(!idExiste) {
+            throw new NaoExisteIdEntregaException();
+        }
     }
 }

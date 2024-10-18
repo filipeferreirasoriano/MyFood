@@ -5,7 +5,8 @@ public enum ShoppingCartStatus {
     PREPARANDO("preparando"),
     FECHADO("fechado"),
     PRONTO("pronto"),
-    ENTREGANDO("entregando");
+    ENTREGANDO("entregando"),
+    ENTREGUE("entregue");
 
     private final String description;
 

@@ -129,4 +129,11 @@ public class Facade {
     public String getEmpresas(int entregador) {
         return system.getEnterprisesDeliveryManString(entregador);
     }
+
+    public int getIdEntrega(int pedido) {
+        return system.getIdDelivey(pedido);
+    }
+    public void entregar(int entrega) {
+        system.deliver(entrega);
+    }
 }
